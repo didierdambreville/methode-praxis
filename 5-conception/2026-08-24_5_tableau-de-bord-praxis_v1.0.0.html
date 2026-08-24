@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tableau de bord — PRAXIS</title>
+<style>
+  /* ============ Jetons (palette validée — mode clair par défaut) ============ */
+  :root{
+    color-scheme: light;
+    --page:#f9f9f7; --surface:#fcfcfb;
+    --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
+    --s1:#2a78d6; --s1-track:#cde2fb;
+    --good:#0ca30c; --good-text:#006300;
+    --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+    --shadow:0 1px 2px rgba(11,11,11,.05),0 4px 14px rgba(11,11,11,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:where(:not([data-theme="light"])){
+      color-scheme: dark;
+      --page:#0d0d0d; --surface:#1a1a19;
+      --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+      --s1:#3987e5; --s1-track:#184f95;
+      --good-text:#0ca30c;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --page:#0d0d0d; --surface:#1a1a19;
+    --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+    --s1:#3987e5; --s1-track:#184f95;
+    --good-text:#0ca30c;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--page); color:var(--ink);
+    font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;
+    padding:0 0 48px;
+  }
+  a{color:var(--s1)}
+
+  /* ============ Structure ============ */
+  header.masthead{
+    background:var(--surface); border-bottom:1px solid var(--grid);
+    padding:18px 28px; display:flex; flex-wrap:wrap; gap:14px; align-items:baseline;
+    position:sticky; top:0; z-index:5; box-shadow:var(--shadow);
+  }
+  .masthead h1{font-size:19px; margin:0; font-weight:650; letter-spacing:.01em}
+  .masthead .sub{color:var(--ink-2); font-size:13px}
+  .masthead .spacer{flex:1}
+  .masthead .meta{color:var(--muted); font-size:12.5px}
+  main{max-width:1180px; margin:0 auto; padding:22px 28px}
+  section{margin:26px 0}
+  h2{font-size:15px; font-weight:650; margin:0 0 4px; letter-spacing:.02em}
+  .h2row{display:flex; align-items:baseline; gap:12px; margin-bottom:12px}
+  .h2row .hint{color:var(--muted); font-size:12.5px}
+
+  .card{background:var(--surface); border:1px solid var(--grid); border-radius:10px; box-shadow:var(--shadow)}
+
+  /* ============ Tuiles ============ */
+  .tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:12px}
+  .tile{padding:14px 16px 12px}
+  .tile .label{color:var(--ink-2); font-size:12.5px; margin-bottom:2px}
+  .tile .value{font-size:30px; font-weight:600; line-height:1.15}
+  .tile .value .unit{font-size:14px; font-weight:500; color:var(--ink-2); margin-left:2px}
+  .tile .note{color:var(--muted); font-size:12px; margin-top:2px}
+  .tile.hero .value{font-size:48px}
+
+  /* ============ Badges d'état (icône + libellé, jamais couleur seule) ===== */
+  .badge{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600;
+         padding:2px 9px 2px 7px; border-radius:999px; border:1px solid var(--ring); white-space:nowrap}
+  .badge .dot{width:8px; height:8px; border-radius:50%; box-shadow:0 0 0 2px var(--surface)}
+  .b-ok    .dot{background:var(--good)}
+  .b-watch .dot{background:var(--warn)}
+  .b-alert .dot{background:var(--crit)}
+  .b-alert{border-color:var(--crit)}
+  .b-neutral .dot{background:var(--muted)}
+
+  /* statuts du registre */
+  .st{display:inline-block; font-size:11.5px; font-weight:650; letter-spacing:.04em;
+      padding:2px 8px; border-radius:5px; border:1px solid var(--ring); color:var(--ink-2)}
+  .st-ACTIF{color:var(--ink); border-color:var(--s1); box-shadow:inset 3px 0 0 var(--s1)}
+  .st-INTENTION{border-style:dashed}
+  .st-SUSPENDU{box-shadow:inset 3px 0 0 var(--warn)}
+  .st-DOMAINE{box-shadow:inset 3px 0 0 var(--good)}
+  .st-ARCHIVE, .st-ARCHIVÉ{opacity:.65}
+  .st-RESSOURCE{box-shadow:inset 3px 0 0 var(--axis)}
+
+  /* ============ Tables ============ */
+  table{width:100%; border-collapse:collapse; font-size:13.5px}
+  th{color:var(--muted); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em;
+     text-align:left; padding:10px 12px; border-bottom:1px solid var(--grid); white-space:nowrap}
+  td{padding:9px 12px; border-bottom:1px solid var(--grid); vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td.num, th.num{text-align:right; font-variant-numeric:tabular-nums}
+  .tablewrap{overflow-x:auto}
+  #registre th:first-child, #registre td:first-child{min-width:250px}
+  #registre th:last-child, #registre td:last-child{min-width:190px}
+  #registre td:nth-child(2){min-width:120px}
+  .rowmuted td{color:var(--muted)}
+  .projname{font-weight:600}
+  .taxon{color:var(--muted); font-size:12px}
+
+  /* jauge de tampon */
+  .meter{display:flex; align-items:center; gap:8px; min-width:130px}
+  .meter .track{flex:1; height:8px; border-radius:4px; background:var(--s1-track); overflow:hidden}
+  .meter .fill{height:100%; border-radius:4px 0 0 4px; background:var(--s1)}
+  .meter.m-warn .fill{background:var(--warn)} .meter.m-warn .track{background:color-mix(in srgb,var(--warn) 22%, var(--surface))}
+  .meter.m-crit .fill{background:var(--crit)} .meter.m-crit .track{background:color-mix(in srgb,var(--crit) 22%, var(--surface))}
+  .meter .pct{font-variant-numeric:tabular-nums; font-size:12.5px; color:var(--ink-2); width:38px; text-align:right}
+
+  /* ============ Indicateurs ============ */
+  .indics{display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:12px}
+  .indic{padding:13px 16px; display:grid; grid-template-columns:1fr auto; gap:4px 12px; align-items:center}
+  .indic .iname{font-weight:600; font-size:13.5px}
+  .indic .idetail{color:var(--muted); font-size:12px; grid-column:1}
+  .indic .ival{font-size:22px; font-weight:600; text-align:right; font-variant-numeric:tabular-nums; grid-row:span 2; align-self:center}
+  .indic .ival .unit{font-size:12px; color:var(--ink-2); font-weight:500}
+  .indic .irow{grid-column:1 / -1; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:6px}
+  .spark{height:26px; width:110px}
+  .spark polyline{fill:none; stroke:var(--s1); stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
+  .spark circle{fill:var(--s1); stroke:var(--surface); stroke-width:2}
+
+  /* ============ Filtres ============ */
+  .filters{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px}
+  .chip{border:1px solid var(--grid); background:var(--surface); color:var(--ink-2);
+        border-radius:999px; padding:4px 12px; font-size:12.5px; cursor:pointer}
+  .chip[aria-pressed="true"]{border-color:var(--s1); color:var(--ink); font-weight:600;
+        box-shadow:inset 0 0 0 1px var(--s1)}
+
+  /* ============ Boutons, dialogue ============ */
+  button.btn{border:1px solid var(--grid); background:var(--surface); color:var(--ink);
+      border-radius:7px; padding:6px 13px; font:600 12.5px system-ui,-apple-system,"Segoe UI",sans-serif; cursor:pointer}
+  button.btn:hover{border-color:var(--axis)}
+  button.btn.primary{background:var(--s1); border-color:var(--s1); color:#fff}
+  dialog{border:1px solid var(--grid); border-radius:12px; background:var(--surface); color:var(--ink);
+      width:min(860px,92vw); padding:0; box-shadow:var(--shadow)}
+  dialog::backdrop{background:rgba(0,0,0,.45)}
+  .dlghead{padding:14px 18px; border-bottom:1px solid var(--grid); display:flex; align-items:center; gap:10px}
+  .dlghead h3{margin:0; font-size:15px}
+  .dlgbody{padding:14px 18px}
+  .dlgbody textarea{width:100%; height:46vh; font:12.5px/1.45 ui-monospace,Consolas,monospace;
+      background:var(--page); color:var(--ink); border:1px solid var(--grid); border-radius:8px; padding:10px; resize:vertical}
+  .dlgfoot{padding:12px 18px; border-top:1px solid var(--grid); display:flex; gap:10px; align-items:center}
+  .dlgfoot .msg{font-size:12.5px; color:var(--ink-2); flex:1}
+  .dlgfoot .msg.err{color:var(--crit); font-weight:600}
+
+  footer.colophon{max-width:1180px; margin:34px auto 0; padding:0 28px; color:var(--muted); font-size:12px;
+      border-top:1px solid var(--grid); padding-top:14px}
+  @media print{ .masthead .actions, .filters, dialog{display:none} body{background:#fff} .card{box-shadow:none} }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <h1 id="hd-title">Tableau de bord</h1>
+  <span class="sub" id="hd-sub">—</span>
+  <span class="spacer"></span>
+  <span class="meta">Revue du <strong id="hd-date">—</strong> · niveau <span id="hd-niveau">—</span> · méthode PRAXIS v1.0</span>
+  <span class="actions">
+    <button class="btn" id="btn-theme" title="Basculer clair / sombre">◐ Thème</button>
+    <button class="btn" id="btn-export" title="Télécharger une copie du fichier avec les données courantes">Exporter</button>
+    <button class="btn primary" id="btn-edit">Modifier les données</button>
+  </span>
+</header>
+
+<main>
+
+  <!-- ═══════════ 1. Vue d'ensemble ═══════════ -->
+  <section id="sec-tuiles" aria-label="Vue d'ensemble">
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <!-- ═══════════ 2. Indicateurs ═══════════ -->
+  <section>
+    <div class="h2row"><h2>Panier d'indicateurs</h2>
+      <span class="hint">neuf signaux, seuils préétablis — vert : ne rien faire · rouge : décider (méthode §8)</span></div>
+    <div class="indics" id="indics"></div>
+  </section>
+
+  <!-- ═══════════ 3. Registre ═══════════ -->
+  <section>
+    <div class="h2row"><h2>Registre des objets pilotés</h2>
+      <span class="hint">source unique de vérité des statuts — toute sortie d'ACTIF : DOMAINE ou ARCHIVÉ, rien d'autre</span></div>
+    <div class="filters" id="reg-filters" role="group" aria-label="Filtrer par statut"></div>
+    <div class="card tablewrap"><table id="registre">
+      <thead><tr>
+        <th>Projet</th><th>Statut</th><th>Posture</th><th>Stade</th><th>Propriétaire</th>
+        <th>Échéance</th><th>Tampon consommé / avancement</th><th>Dernière décision</th>
+      </tr></thead><tbody></tbody>
+    </table></div>
+  </section>
+
+  <!-- ═══════════ 4. Sas ═══════════ -->
+  <section>
+    <div class="h2row"><h2>Sas</h2>
+      <span class="hint">zone de flux, purgée à chaque revue — un élément de plus de deux cycles est une décision non prise (E3)</span></div>
+    <div class="card tablewrap"><table id="sas">
+      <thead><tr><th>Élément</th><th>Déposé le</th><th class="num">Âge (j)</th><th>État</th><th>Question qui bloque</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </section>
+
+  <!-- ═══════════ 5. Journal des décisions ═══════════ -->
+  <section>
+    <div class="h2row"><h2>Journal des décisions</h2>
+      <span class="hint">une ligne datée et motivée par décision — l'historique décisionnel du portefeuille (T3)</span></div>
+    <div class="card tablewrap"><table id="journal">
+      <thead><tr><th>Date</th><th>Objet</th><th>Décision</th><th>Motif</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </section>
+
+  <!-- ═══════════ 6. Historique hebdomadaire ═══════════ -->
+  <section>
+    <div class="h2row"><h2>Historique des revues</h2>
+      <span class="hint">une entrée par revue hebdomadaire — la tendance importe plus que la valeur (T7)</span></div>
+    <div class="card tablewrap"><table id="histo">
+      <thead><tr><th>Semaine</th><th class="num">Sas</th><th class="num">Actifs</th><th class="num">Taux de sortie 90 j</th>
+        <th class="num">Latence décis. (j)</th><th class="num">Tampon max (%)</th><th>Note</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </section>
+
+</main>
+
+<footer class="colophon">
+  Méthode PRAXIS v1.0 — D. Dambreville — domaine public (CC0 1.0).
+  Ce fichier est autonome : le registre vit dans son bloc <code>PRAXIS_DATA</code> ;
+  mettez-le à jour au geste ⑤ de chaque revue (bouton « Modifier les données », ou par votre assistant IA),
+  puis « Exporter » pour enregistrer la nouvelle version du fichier.
+</footer>
+
+<!-- ═══════════ Dialogue d'édition ═══════════ -->
+<dialog id="dlg">
+  <div class="dlghead"><h3>Modifier les données (bloc PRAXIS_DATA)</h3></div>
+  <div class="dlgbody">
+    <textarea id="dlg-json" spellcheck="false" aria-label="Données JSON"></textarea>
+  </div>
+  <div class="dlgfoot">
+    <span class="msg" id="dlg-msg">Modifiez le JSON puis appliquez. « Exporter » (en-tête) télécharge ensuite le fichier mis à jour, à enregistrer à la place de l'ancien.</span>
+    <button class="btn" id="dlg-cancel">Annuler</button>
+    <button class="btn primary" id="dlg-apply">Appliquer</button>
+  </div>
+</dialog>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PRAXIS_DATA — SOURCE UNIQUE DE VÉRITÉ DU REGISTRE (règle T1)
+     Les données ci-dessous sont un EXEMPLE ENTIÈREMENT FICTIF, fourni pour
+     illustrer le rendu : remplacez tous les éléments [entre crochets] et les
+     entrées d'exemple par vos propres données à la première utilisation.
+     Éditable à la main, par le dialogue intégré, ou par l'assistant IA.
+     Dates au format AAAA-MM-JJ. Statuts : INTENTION | ACTIF | SUSPENDU |
+     DOMAINE | RESSOURCE | ARCHIVÉ. Postures : P1..P5. Stades : 0..9.
+     ════════════════════════════════════════════════════════════════════════ -->
+<script id="PRAXIS_DATA" type="application/json">
+{
+  "portefeuille": "[NOM DU PORTEFEUILLE]",
+  "niveau_conformite": 1,
+  "date_revue": "2026-01-12",
+  "cycle_purge_jours": 7,
+  "limite_encours_par_personne": 2,
+  "personnes": ["[INITIALES]"],
+  "registre": [
+    {
+      "id": "PROJET-ALPHA", "nom": "[Projet exemple Alpha — remplacez-moi]", "taxon": "A-MARQUE-UN/PROJET-ALPHA",
+      "statut": "ACTIF", "posture": "P2", "stade": 6, "proprietaire": "[INITIALES]",
+      "echeance": "2026-03-15", "date_statut": "2025-12-01",
+      "tampon_consomme_pct": 35, "avancement_pct": 55,
+      "benefice": "[Grandeur mesurable] +[N]/mois à M+6 — ligne de base mesurée le 2025-11-25 : [valeur]",
+      "derniere_decision": "2026-01-05 — [décision structurante validée]"
+    },
+    {
+      "id": "DOMAINE-BETA", "nom": "[Domaine exemple Bêta — activité exploitée]", "taxon": "A-MARQUE-UN/DOMAINE-BETA",
+      "statut": "DOMAINE", "posture": "P3", "stade": 7, "proprietaire": "[INITIALES]",
+      "echeance": "", "date_statut": "2025-09-10",
+      "tampon_consomme_pct": null, "avancement_pct": null,
+      "benefice": "Procédure d'exploitation : 2025-09-10_7_procedure-exploitation.md",
+      "derniere_decision": "2026-01-08 — [incident corrigé, runbook mis à jour]"
+    },
+    {
+      "id": "PROJET-GAMMA", "nom": "[Projet exemple Gamma — suspendu]", "taxon": "B-MARQUE-DEUX/PROJET-GAMMA",
+      "statut": "SUSPENDU", "posture": "P1", "stade": 5, "proprietaire": "[INITIALES]",
+      "echeance": "2026-04-01", "date_statut": "2025-11-20",
+      "tampon_consomme_pct": 60, "avancement_pct": 30,
+      "benefice": "Condition de reprise : clôture de PROJET-ALPHA — réexamen le 2026-04-01",
+      "derniere_decision": "2025-11-20 — suspension, condition de reprise datée"
+    },
+    {
+      "id": "IDEE-DELTA", "nom": "[Idée exemple Delta — à instruire]", "taxon": "0-PILOTAGE",
+      "statut": "INTENTION", "posture": "", "stade": 1, "proprietaire": "[INITIALES]",
+      "echeance": "", "date_statut": "2026-01-02",
+      "tampon_consomme_pct": null, "avancement_pct": null,
+      "benefice": "À instruire : énoncé de bénéfice + critères d'abandon avant tout engagement",
+      "derniere_decision": "2026-01-02 — inscrite en intention, prochaine revue mensuelle"
+    }
+  ],
+  "sas": [
+    { "nom": "[facture-fournisseur.pdf]", "depose_le": "2026-01-09", "question": "" },
+    { "nom": "[notes-entretien.txt]", "depose_le": "2026-01-11", "question": "" }
+  ],
+  "journal": [
+    { "date": "2026-01-05", "objet": "PROJET-ALPHA", "decision": "[Validation d'un livrable de conception]", "motif": "[retours convergents de N entretiens]" },
+    { "date": "2026-01-02", "objet": "IDEE-DELTA", "decision": "Inscription en INTENTION", "motif": "opportunité identifiée ; instruction différée — limite d'encours atteinte" },
+    { "date": "2025-11-20", "objet": "PROJET-GAMMA", "decision": "Suspension avec condition de reprise", "motif": "encours > 2 ; priorité au projet Alpha" }
+  ],
+  "indicateurs_manuels": {
+    "latence_decisionnelle_jours": 2,
+    "taux_sortie_90j": 1.0,
+    "benefice_realise_pct_prevu": null,
+    "indice_divergence": "nul",
+    "commentaire_divergence": "registre confronté aux artefacts le 2026-01-12 — aucun écart"
+  },
+  "historique": [
+    { "semaine": "2026-S01", "sas": 5, "actifs": 1, "taux_sortie": 1.0, "latence": 3, "tampon_max": 30, "note": "" },
+    { "semaine": "2026-S02", "sas": 2, "actifs": 1, "taux_sortie": 1.0, "latence": 2, "tampon_max": 35, "note": "revue du 2026-01-12" }
+  ]
+}
+</script>
+
+<script>
+"use strict";
+/* ════════════════ Lecture des données ════════════════ */
+let DATA;
+function loadData(){
+  const raw = document.getElementById("PRAXIS_DATA").textContent;
+  DATA = JSON.parse(raw);
+}
+const fmtDate = s => s ? s : "—";
+const today = () => (DATA.date_revue && /^\d{4}-\d{2}-\d{2}$/.test(DATA.date_revue)) ? new Date(DATA.date_revue+"T12:00:00") : new Date();
+const ageJours = d => { if(!d) return null; const t = today() - new Date(d+"T12:00:00"); return Math.max(0, Math.round(t/86400000)); };
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+
+/* Badge d'état : icône + libellé, jamais la couleur seule */
+function badge(state, label){
+  const cls = {ok:"b-ok", watch:"b-watch", alert:"b-alert", neutral:"b-neutral"}[state] || "b-neutral";
+  const icon = {ok:"✓", watch:"△", alert:"✕", neutral:"·"}[state] || "·";
+  return `<span class="badge ${cls}"><span class="dot" aria-hidden="true"></span>${icon} ${esc(label)}</span>`;
+}
+
+/* ════════════════ Calculs (sources indépendantes du déclarant) ════════════════ */
+function computeAll(){
+  const R = DATA.registre || [], S = DATA.sas || [], H = DATA.historique || [], M = DATA.indicateurs_manuels || {};
+  const cycle = DATA.cycle_purge_jours || 7;
+  const actifs = R.filter(p => p.statut === "ACTIF");
+  const parPersonne = {};
+  actifs.forEach(p => { (p.proprietaire||"?").split("+").forEach(x => { parPersonne[x.trim()] = (parPersonne[x.trim()]||0)+1; }); });
+  const maxEncours = Math.max(0, ...Object.values(parPersonne));
+  const sasAges = S.map(x => ageJours(x.depose_le) ?? 0);
+  const sasMax = sasAges.length ? Math.max(...sasAges) : 0;
+  const agesActifs = actifs.map(p => ageJours(p.date_statut)).filter(x => x != null);
+  const plusAncienActif = agesActifs.length ? Math.max(...agesActifs) : 0;
+  const tampons = actifs.filter(p => p.tampon_consomme_pct != null);
+  const tamponEcartMax = tampons.length ? Math.max(...tampons.map(p => (p.tampon_consomme_pct||0) - (p.avancement_pct||0))) : null;
+  // charge du sas : croissance sur 3 cycles (historique)
+  const sasSerie = H.map(h => h.sas);
+  const sasCroissant3 = sasSerie.length >= 3 && sasSerie.slice(-3).every((v,i,a) => i===0 || v > a[i-1]);
+  return {
+    actifs, nActifs: actifs.length, parPersonne, maxEncours,
+    nIntentions: R.filter(p=>p.statut==="INTENTION").length,
+    nSuspendus: R.filter(p=>p.statut==="SUSPENDU").length,
+    nDomaines: R.filter(p=>p.statut==="DOMAINE").length,
+    sasN: S.length, sasMax, sasCroissant3, cycle,
+    plusAncienActif, tamponEcartMax,
+    latence: M.latence_decisionnelle_jours, tauxSortie: M.taux_sortie_90j,
+    benefice: M.benefice_realise_pct_prevu, divergence: M.indice_divergence
+  };
+}
+
+/* ════════════════ Tuiles ════════════════ */
+function renderTiles(C){
+  const lim = DATA.limite_encours_par_personne || 2;
+  const alertes = collectIndics(C).filter(i => i.state === "alert").length;
+  const t = [
+    {label:"Projets actifs", value:C.nActifs, note:`limite : ${lim} / personne · max constaté : ${C.maxEncours}`,
+     state: C.maxEncours > lim ? "alert" : "ok"},
+    {label:"Charge du sas", value:C.sasN, note:`plus ancien : ${C.sasMax} j (cycle : ${C.cycle} j)`,
+     state: C.sasMax > 2*C.cycle ? "alert" : (C.sasN > 0 ? "watch" : "ok")},
+    {label:"Intentions en attente", value:C.nIntentions, note:"revues au rendez-vous mensuel", state:"neutral"},
+    {label:"Suspendus", value:C.nSuspendus, note:"chacun a une condition de reprise datée", state: C.nSuspendus ? "watch" : "ok"},
+    {label:"Domaines exploités", value:C.nDomaines, note:"chacun a sa procédure (C3)", state:"neutral"},
+    {label:"Alertes actives", value:alertes, note: alertes ? "voir le panier d'indicateurs" : "aucune décision forcée cette semaine",
+     state: alertes ? "alert" : "ok"}
+  ];
+  document.getElementById("tiles").innerHTML = t.map(x => `
+    <div class="card tile">
+      <div class="label">${esc(x.label)}</div>
+      <div class="value">${x.value}<span class="unit"></span></div>
+      <div class="note">${esc(x.note)}</div>
+      <div style="margin-top:7px">${badge(x.state, {ok:"nominal", watch:"à surveiller", alert:"alerte", neutral:"—"}[x.state])}</div>
+    </div>`).join("");
+}
+
+/* ════════════════ Indicateurs (panier §8.2) ════════════════ */
+function collectIndics(C){
+  const lim = DATA.limite_encours_par_personne || 2;
+  const H = DATA.historique || [];
+  const serie = k => H.map(h => h[k]).filter(v => v != null && v !== "");
+  const list = [
+    { n:"1 · Charge du sas", d:`seuil : croissance sur 3 cycles · âge max > ${2*C.cycle} j`,
+      v:C.sasN, u:"élém.", spark:serie("sas"),
+      state: (C.sasCroissant3 || C.sasMax > 2*C.cycle) ? "alert" : (C.sasN>0 ? "ok" : "ok") },
+    { n:"2 · Latence de classement", d:`âge du plus ancien élément du sas · seuil : > ${C.cycle} j`,
+      v:C.sasMax, u:"j", spark:[],
+      state: C.sasMax > C.cycle ? (C.sasMax > 2*C.cycle ? "alert" : "watch") : "ok" },
+    { n:"3 · Encours actif par personne", d:`seuil : > ${lim}`,
+      v:C.maxEncours, u:`/ ${lim}`, spark:serie("actifs"),
+      state: C.maxEncours > lim ? "alert" : "ok" },
+    { n:"4 · Âge du plus ancien actif", d:"seuil indicatif : > 2× le délai médian de vos projets",
+      v:C.plusAncienActif, u:"j", spark:[],
+      state: "neutral" },
+    { n:"5 · Taux de sortie (90 j)", d:"projets clos / projets ouverts · seuil : durablement < 1",
+      v:(C.tauxSortie ?? "—"), u:"", spark:serie("taux_sortie"),
+      state: C.tauxSortie == null ? "neutral" : (C.tauxSortie < 1 ? "watch" : "ok") },
+    { n:"6 · Tampon vs avancement", d:"écart max (consommé − avancement) · seuil : > +20 pts",
+      v:(C.tamponEcartMax == null ? "—" : (C.tamponEcartMax>0?"+":"")+C.tamponEcartMax), u:"pts", spark:serie("tampon_max"),
+      state: C.tamponEcartMax == null ? "neutral" : (C.tamponEcartMax > 20 ? "alert" : (C.tamponEcartMax > 10 ? "watch" : "ok")) },
+    { n:"7 · Latence décisionnelle", d:"médiane saisine → arbitrage · seuil : > 5 j ouvrés",
+      v:(C.latence ?? "—"), u:"j", spark:serie("latence"),
+      state: C.latence == null ? "neutral" : (C.latence > 5 ? "alert" : "ok") },
+    { n:"8 · Bénéfice réalisé / prévu", d:"mesuré à 6 et 12 mois · seuil : écart > 20 %",
+      v:(C.benefice == null ? "—" : C.benefice+" %"), u:"", spark:[],
+      state: C.benefice == null ? "neutral" : (Math.abs(100-C.benefice) > 20 ? "alert" : "ok") },
+    { n:"9 · Indice de divergence", d:"statut déclaré vs données constatées · seuil : tout écart persistant",
+      v:(C.divergence ?? "—"), u:"", spark:[],
+      state: C.divergence == null ? "neutral" : (String(C.divergence).toLowerCase().startsWith("nul") ? "ok" : "alert") }
+  ];
+  return list;
+}
+function sparkline(vals){
+  if(!vals || vals.length < 2) return "";
+  const w=110, h=26, pad=3;
+  const min = Math.min(...vals), max = Math.max(...vals), span = (max-min) || 1;
+  const pts = vals.map((v,i)=>[pad + i*(w-2*pad)/(vals.length-1), h-pad-(v-min)*(h-2*pad)/span]);
+  const last = pts[pts.length-1];
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" role="img" aria-label="tendance : ${vals.join(", ")}">
+    <polyline points="${pts.map(p=>p.map(n=>n.toFixed(1)).join(",")).join(" ")}"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3.5"/></svg>`;
+}
+function renderIndics(C){
+  document.getElementById("indics").innerHTML = collectIndics(C).map(i => `
+    <div class="card indic">
+      <div class="iname">${esc(i.n)}</div>
+      <div class="ival">${esc(String(i.v))}<span class="unit"> ${esc(i.u)}</span></div>
+      <div class="idetail">${esc(i.d)}</div>
+      <div class="irow">
+        ${badge(i.state, {ok:"nominal", watch:"à surveiller", alert:"alerte — décider", neutral:"non mesuré"}[i.state])}
+        ${sparkline(i.spark)}
+      </div>
+    </div>`).join("");
+}
+
+/* ════════════════ Registre ════════════════ */
+const STADES = ["0 pilotage","1 observation","2 bordures","3 ressources","4 évaluation","5 conception","6 installation","7 maintenance","8 récolte","9 disposition"];
+let regFilter = "TOUS";
+function renderRegFilters(){
+  const statuts = ["TOUS","ACTIF","INTENTION","SUSPENDU","DOMAINE","RESSOURCE","ARCHIVÉ"];
+  document.getElementById("reg-filters").innerHTML = statuts.map(s =>
+    `<button class="chip" aria-pressed="${s===regFilter}" data-f="${s}">${s === "TOUS" ? "Tous" : s}</button>`).join("");
+  document.querySelectorAll("#reg-filters .chip").forEach(b => b.onclick = () => { regFilter = b.dataset.f; renderRegistre(); renderRegFilters(); });
+}
+function meterHtml(p){
+  if(p.tampon_consomme_pct == null) return `<span class="taxon">—</span>`;
+  const ecart = (p.tampon_consomme_pct||0) - (p.avancement_pct||0);
+  const cls = ecart > 20 ? "m-crit" : (ecart > 10 ? "m-warn" : "");
+  return `<div class="meter ${cls}" title="tampon consommé ${p.tampon_consomme_pct} % · avancement ${p.avancement_pct ?? "—"} %">
+    <div class="track"><div class="fill" style="width:${Math.min(100,p.tampon_consomme_pct)}%"></div></div>
+    <span class="pct">${p.tampon_consomme_pct}%</span></div>
+  <div class="taxon">avancement : ${p.avancement_pct ?? "—"} %</div>`;
+}
+function renderRegistre(){
+  const rows = (DATA.registre||[]).filter(p => regFilter==="TOUS" || (p.statut||"").toUpperCase().replace("ARCHIVE","ARCHIVÉ") === regFilter);
+  const order = {ACTIF:0, SUSPENDU:1, INTENTION:2, DOMAINE:3, RESSOURCE:4, "ARCHIVÉ":5, ARCHIVE:5};
+  rows.sort((a,b) => (order[a.statut]??9)-(order[b.statut]??9) || (a.echeance||"9999").localeCompare(b.echeance||"9999"));
+  document.querySelector("#registre tbody").innerHTML = rows.length ? rows.map(p => `
+    <tr class="${["ARCHIVÉ","ARCHIVE","RESSOURCE"].includes(p.statut)?"rowmuted":""}">
+      <td><div class="projname">${esc(p.nom)}</div><div class="taxon">${esc(p.taxon||"")}</div>
+          ${p.benefice ? `<div class="taxon" style="margin-top:3px">◈ ${esc(p.benefice)}</div>` : ""}</td>
+      <td><span class="st st-${esc((p.statut||"").replace("É","E"))} st-${esc(p.statut||"")}">${esc(p.statut||"—")}</span>
+          <div class="taxon" style="margin-top:3px">depuis ${fmtDate(p.date_statut)}</div></td>
+      <td>${esc(p.posture||"—")}</td>
+      <td title="${esc(STADES[p.stade]||"")}">${p.stade ?? "—"} <span class="taxon">${esc((STADES[p.stade]||"").split(" ")[1]||"")}</span></td>
+      <td>${esc(p.proprietaire||"—")}</td>
+      <td>${fmtDate(p.echeance)}</td>
+      <td>${meterHtml(p)}</td>
+      <td class="taxon">${esc(p.derniere_decision||"—")}</td>
+    </tr>`).join("") : `<tr><td colspan="8" class="taxon">Aucun objet pour ce filtre.</td></tr>`;
+}
+
+/* ════════════════ Sas ════════════════ */
+function renderSas(C){
+  const rows = DATA.sas || [];
+  document.querySelector("#sas tbody").innerHTML = rows.length ? rows.map(x => {
+    const a = ageJours(x.depose_le) ?? 0;
+    const st = a > 2*C.cycle ? "alert" : (a > C.cycle ? "watch" : "ok");
+    return `<tr>
+      <td>${esc(x.nom)}</td><td>${fmtDate(x.depose_le)}</td><td class="num">${a}</td>
+      <td>${badge(st, {ok:"dans le cycle", watch:"> 1 cycle", alert:"décision non prise (E3)"}[st])}</td>
+      <td class="taxon">${esc(x.question||"—")}</td></tr>`;
+  }).join("") : `<tr><td colspan="5">${badge("ok","sas vide")} <span class="taxon" style="margin-left:8px">état de sortie normal d'une revue.</span></td></tr>`;
+}
+
+/* ════════════════ Journal & historique ════════════════ */
+function renderJournal(){
+  const rows = [...(DATA.journal||[])].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  document.querySelector("#journal tbody").innerHTML = rows.length ? rows.map(j => `
+    <tr><td style="white-space:nowrap">${fmtDate(j.date)}</td><td class="projname">${esc(j.objet)}</td>
+    <td>${esc(j.decision)}</td><td class="taxon">${esc(j.motif||"")}</td></tr>`).join("")
+    : `<tr><td colspan="4" class="taxon">Aucune décision consignée — si cela dure un mois, le dispositif ne fonctionne pas (piège 14).</td></tr>`;
+}
+function renderHisto(){
+  const rows = [...(DATA.historique||[])].reverse();
+  document.querySelector("#histo tbody").innerHTML = rows.length ? rows.map(h => `
+    <tr><td>${esc(h.semaine)}</td><td class="num">${h.sas ?? "—"}</td><td class="num">${h.actifs ?? "—"}</td>
+    <td class="num">${h.taux_sortie ?? "—"}</td><td class="num">${h.latence ?? "—"}</td>
+    <td class="num">${h.tampon_max ?? "—"}</td><td class="taxon">${esc(h.note||"")}</td></tr>`).join("")
+    : `<tr><td colspan="7" class="taxon">Aucune entrée — ajoutez-en une à chaque revue.</td></tr>`;
+}
+
+/* ════════════════ En-tête ════════════════ */
+function renderHead(){
+  document.getElementById("hd-title").textContent = "Tableau de bord — " + (DATA.portefeuille || "Portefeuille");
+  document.getElementById("hd-sub").textContent = "registre · indicateurs · décisions · sas";
+  document.getElementById("hd-date").textContent = fmtDate(DATA.date_revue);
+  document.getElementById("hd-niveau").textContent = DATA.niveau_conformite ?? "—";
+  document.title = "Tableau de bord — " + (DATA.portefeuille || "PRAXIS");
+}
+
+/* ════════════════ Rendu global ════════════════ */
+function renderAll(){
+  const C = computeAll();
+  renderHead(); renderTiles(C); renderIndics(C); renderRegFilters(); renderRegistre(); renderSas(C); renderJournal(); renderHisto();
+}
+
+/* ════════════════ Édition, export, thème ════════════════ */
+const dlg = document.getElementById("dlg");
+document.getElementById("btn-edit").onclick = () => {
+  document.getElementById("dlg-json").value = JSON.stringify(DATA, null, 2);
+  document.getElementById("dlg-msg").textContent = "Modifiez le JSON puis appliquez. Pensez ensuite à « Exporter » pour enregistrer le fichier mis à jour.";
+  document.getElementById("dlg-msg").classList.remove("err");
+  dlg.showModal();
+};
+document.getElementById("dlg-cancel").onclick = () => dlg.close();
+document.getElementById("dlg-apply").onclick = () => {
+  const msg = document.getElementById("dlg-msg");
+  try{
+    const parsed = JSON.parse(document.getElementById("dlg-json").value);
+    if(!Array.isArray(parsed.registre)) throw new Error("le champ « registre » doit être un tableau");
+    DATA = parsed;
+    document.getElementById("PRAXIS_DATA").textContent = "\n" + JSON.stringify(DATA, null, 2) + "\n";
+    renderAll(); dlg.close();
+  }catch(e){ msg.textContent = "JSON invalide — " + e.message; msg.classList.add("err"); }
+};
+document.getElementById("btn-export").onclick = () => {
+  const clone = document.documentElement.cloneNode(true);
+  clone.querySelector("#PRAXIS_DATA").textContent = "\n" + JSON.stringify(DATA, null, 2) + "\n";
+  const dl = clone.querySelector("dialog"); if(dl) dl.removeAttribute("open");
+  const html = "<!doctype html>\n" + clone.outerHTML;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([html], {type:"text/html"}));
+  a.download = "tableau_de_bord.html";
+  a.click(); URL.revokeObjectURL(a.href);
+};
+document.getElementById("btn-theme").onclick = () => {
+  const r = document.documentElement;
+  const cur = r.getAttribute("data-theme");
+  const prefersDark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const isDark = cur === "dark" || (cur !== "light" && prefersDark);
+  r.setAttribute("data-theme", isDark ? "light" : "dark");
+};
+
+loadData(); renderAll();
+</script>
+</body>
+</html>
