@@ -4,7 +4,7 @@
 **Version** 1.0
 **Date** 2026-08-18
 **Statut** Spécification ouverte
-**Licence proposée** CC BY-SA 4.0
+**Licence** CC BY-SA 4.0
 
 ---
 
