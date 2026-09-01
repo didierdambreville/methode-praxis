@@ -42,7 +42,7 @@ La colonne d'un objet se **déduit** de son statut et de son stade : aucun champ
 
 1. Lire la **[notice d'utilisation](7-exploitation/2026-09-01_7_notice-utilisation_v1.1.0.md)** — installation en 15 minutes.
 2. Ouvrir **[le tableau de bord](5-conception/2026-09-01_5_tableau-de-bord-praxis_v1.2.0.html)** dans un navigateur (télécharger le fichier, double-cliquer, puis l'enregistrer sous son nom d'usage `tableau_de_bord.html`).
-3. Lire la **[méthode intégrale](5-conception/2026-09-01_5_methode-praxis_v1.2.0.md)** ([PDF](5-conception/2026-09-01_5_methode-praxis_v1.2.0.pdf)) pour la doctrine, les règles et les annexes.
+3. Lire la **[méthode intégrale](5-conception/2026-09-01_5_methode-praxis_v1.2.1.md)** ([PDF](5-conception/2026-09-01_5_methode-praxis_v1.2.1.pdf)) pour la doctrine, les règles et les annexes.
 
 ## Contenu du dépôt
 

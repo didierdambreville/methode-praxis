@@ -7,10 +7,10 @@
 ---
 
 **Auteur :** D. Dambreville
-**Version :** 1.0
+**Version :** 1.1
 **Date :** 18 août 2026
 **Statut :** édition publique
-**Licence proposée :** Creative Commons Attribution 4.0 International (CC BY 4.0)
+**Licence :** Creative Commons Attribution 4.0 International (CC BY 4.0)
 **Format :** Markdown (CommonMark)
 
 ---

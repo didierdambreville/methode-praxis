@@ -16,7 +16,7 @@ Ce document n'est pas un cadre théorique de plus. Les fondements existent déj�
 
 - le **Référentiel de classification unifiée des projets** (RCUP, v1.0) répond à la question *où ranger, et dans quel état est chaque chose* ;
 - la **méthode TELOS** (v1.1) répond à la question *comment conduire un projet pour qu'il produise un bénéfice vérifié* ;
-- la **méthode SOBRE** (v1.0) répond à la question *comment instruire un assistant IA pour qu'il travaille juste* ;
+- la **méthode SOBRE** (v1.1) répond à la question *comment instruire un assistant IA pour qu'il travaille juste* ;
 - le **modèle de Contexte de projet** et le **modèle de Classeur de pilotage** matérialisent la mémoire et le suivi d'un projet.
 
 PRAXIS n'invente aucun de ces contenus. Elle les **ordonne en une méthode de travail** : un petit nombre de dispositifs matériels, un cycle opératoire en cinq gestes, des cadences fixes, un tableau de bord unique. Son ambition est une utilisation **minimaliste** : déposer les fichiers dans le sas, les faire analyser, vérifier les données, les classer selon le gabarit de nommage, mettre à jour le contexte, le pilotage et le tableau de bord. Tout le reste — la doctrine, les justifications, la bibliographie — demeure dans les documents fondateurs, consultés à la demande.
@@ -602,10 +602,10 @@ Une mise en œuvre **DOIT** déclarer son niveau ; toute dérogation à une exig
 | Boucles simple/double/triple, clôture en trois actes, vérification des bénéfices | TELOS v1.1 | strate S, §7 |
 | Cadence opératoire, prémortem, revue sans blâme | TELOS v1.1 | §9 |
 | Pièges 2, 4–11, 14 du §10 | TELOS v1.1 | §8 (référentiel des 26 pièges) |
-| Sobriété, orthogonalité, bornage, révélation progressive, évaluation | SOBRE v1.0 | §5 |
-| Pile d'instruction L0–L7 | SOBRE v1.0 | §6 |
-| Frontière d'instruction, triade létale, confirmation des effets de bord | SOBRE v1.0 | §22 |
-| Prompt en huit blocs, test de retrait, audit par génération de modèle | SOBRE v1.0 | §16, §5-S, §4.6 |
+| Sobriété, orthogonalité, bornage, révélation progressive, évaluation | SOBRE v1.1 | §5 |
+| Pile d'instruction L0–L7 | SOBRE v1.1 | §6 |
+| Frontière d'instruction, triade létale, confirmation des effets de bord | SOBRE v1.1 | §22 |
+| Prompt en huit blocs, test de retrait, audit par génération de modèle | SOBRE v1.1 | §16, §5-S, §4.6 |
 | Tableau de flux, limites d'encours par colonne, règles de sortie explicites, âge des cartes | Méthode **Kanban** appliquée au travail de connaissance | pratiques : visualiser, limiter l'encours, gérer le flux, expliciter les règles |
 | Temps de cycle, débit, relation encours = débit × temps de cycle | Théorie des files d'attente (loi de Little), reprise par Kanban | §6.4 |
 | Structure du document de contexte | Modèle Contexte_Projet | intégral |
