@@ -128,6 +128,43 @@
   .spark polyline{fill:none; stroke:var(--s1); stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
   .spark circle{fill:var(--s1); stroke:var(--surface); stroke-width:2}
 
+  /* ============ Tableau de flux (Kanban — méthode §6) ============ */
+  .flux{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(152px,1fr); gap:9px;
+        overflow-x:auto; padding-bottom:8px; align-items:stretch}
+  .col{display:flex; flex-direction:column; min-height:126px}
+  .colhead{padding:9px 11px 8px; border-bottom:1px solid var(--grid)}
+  .colhead .cn{font-weight:650; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; display:block}
+  .colhead .cst{color:var(--muted); font-size:11px; margin-top:1px; display:block}
+  .colhead .cwip{display:flex; align-items:baseline; gap:6px; margin-top:6px}
+  .colhead .cwip .n{font-size:19px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1}
+  .colhead .cwip .lim{font-size:11.5px; color:var(--ink-2)}
+  .col.over{border-color:var(--crit)}
+  .col.over .colhead{box-shadow:inset 0 3px 0 0 var(--crit)}
+  .col.full .colhead{box-shadow:inset 0 3px 0 0 var(--warn)}
+  .cards{padding:8px; display:flex; flex-direction:column; gap:7px; flex:1}
+  .kcard{border:1px solid var(--grid); border-radius:8px; padding:7px 9px; background:var(--page)}
+  .kcard .kn{font-weight:600; font-size:12.5px; line-height:1.3}
+  .kcard .kid{color:var(--muted); font-size:10.5px; letter-spacing:.04em; text-transform:uppercase}
+  .kcard .kmeta{color:var(--ink-2); font-size:11.5px; margin-top:4px; display:flex; gap:3px 10px; flex-wrap:wrap;
+                font-variant-numeric:tabular-nums}
+  .kcard .kmeta span{white-space:nowrap}
+  .kcard .knote{color:var(--ink-2); font-size:11.5px; margin-top:4px; line-height:1.35}
+  .kcard.aged .knote{color:var(--crit); font-weight:650}
+  .kcard .kmore{color:var(--muted); font-size:11.5px; padding:2px 3px}
+  .kcard.aged{border-color:var(--crit); box-shadow:inset 3px 0 0 var(--crit)}
+  .kcard.aged .kage{color:var(--crit); font-weight:650}
+  .kempty{color:var(--muted); font-size:11.5px; padding:6px 3px}
+  .fluxmes{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px}
+  .fluxmes .m{padding:10px 14px; flex:1 1 190px}
+  .fluxmes .m .label{color:var(--ink-2); font-size:12.5px}
+  .fluxmes .m .value{font-size:25px; font-weight:600; line-height:1.2; font-variant-numeric:tabular-nums}
+  .fluxmes .m .value .unit{font-size:12.5px; font-weight:500; color:var(--ink-2); margin-left:3px}
+  .fluxmes .m .note{color:var(--muted); font-size:11.5px; margin-top:2px}
+  .reserve{margin-top:12px; padding:10px 12px}
+  .reserve .rt{font-size:11.5px; font-weight:650; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2)}
+  .reserve .rlist{display:flex; flex-wrap:wrap; gap:7px; margin-top:8px}
+  .reserve .kcard{flex:0 1 260px}
+
   /* ============ Filtres ============ */
   .filters{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px}
   .chip{border:1px solid var(--grid); background:var(--surface); color:var(--ink-2);
@@ -154,7 +191,9 @@
 
   footer.colophon{max-width:1180px; margin:34px auto 0; padding:0 28px; color:var(--muted); font-size:12px;
       border-top:1px solid var(--grid); padding-top:14px}
-  @media print{ .masthead .actions, .filters, dialog{display:none} body{background:#fff} .card{box-shadow:none} }
+  @media print{ .masthead .actions, .filters, dialog{display:none} body{background:#fff} .card{box-shadow:none}
+    .flux{grid-auto-flow:row; grid-auto-columns:auto; grid-template-columns:repeat(2,1fr); overflow:visible}
+    .col{break-inside:avoid} }
 </style>
 </head>
 <body>
@@ -163,7 +202,7 @@
   <h1 id="hd-title">Tableau de bord</h1>
   <span class="sub" id="hd-sub">—</span>
   <span class="spacer"></span>
-  <span class="meta">Revue du <strong id="hd-date">—</strong> · niveau <span id="hd-niveau">—</span> · méthode PRAXIS v1.0</span>
+  <span class="meta">Revue du <strong id="hd-date">—</strong> · niveau <span id="hd-niveau">—</span> · méthode PRAXIS v1.2</span>
   <span class="actions">
     <button class="btn" id="btn-theme" title="Basculer clair / sombre">◐ Thème</button>
     <button class="btn" id="btn-export" title="Télécharger une copie du fichier avec les données courantes">Exporter</button>
@@ -178,14 +217,23 @@
     <div class="tiles" id="tiles"></div>
   </section>
 
-  <!-- ═══════════ 2. Indicateurs ═══════════ -->
+  <!-- ═══════════ 2. Tableau de flux (méthode §6) ═══════════ -->
+  <section id="sec-flux">
+    <div class="h2row"><h2>Tableau de flux</h2>
+      <span class="hint">une vue du registre, jamais une source (K1) — se lit de droite à gauche : aider à finir avant de commencer (K3)</span></div>
+    <div class="flux" id="flux" role="list" aria-label="Colonnes du flux"></div>
+    <div class="card reserve" id="reserve"></div>
+    <div class="fluxmes" id="fluxmes"></div>
+  </section>
+
+  <!-- ═══════════ 3. Indicateurs ═══════════ -->
   <section>
     <div class="h2row"><h2>Panier d'indicateurs</h2>
-      <span class="hint">neuf signaux, seuils préétablis — vert : ne rien faire · rouge : décider (méthode §8)</span></div>
+      <span class="hint">neuf signaux, seuils préétablis — vert : ne rien faire · rouge : décider (méthode §9)</span></div>
     <div class="indics" id="indics"></div>
   </section>
 
-  <!-- ═══════════ 3. Registre ═══════════ -->
+  <!-- ═══════════ 4. Registre ═══════════ -->
   <section>
     <div class="h2row"><h2>Registre des objets pilotés</h2>
       <span class="hint">source unique de vérité des statuts — toute sortie d'ACTIF : DOMAINE ou ARCHIVÉ, rien d'autre</span></div>
@@ -198,7 +246,7 @@
     </table></div>
   </section>
 
-  <!-- ═══════════ 4. Sas ═══════════ -->
+  <!-- ═══════════ 5. Sas ═══════════ -->
   <section>
     <div class="h2row"><h2>Sas</h2>
       <span class="hint">zone de flux, purgée à chaque revue — un élément de plus de deux cycles est une décision non prise (E3)</span></div>
@@ -208,7 +256,7 @@
     </table></div>
   </section>
 
-  <!-- ═══════════ 5. Journal des décisions ═══════════ -->
+  <!-- ═══════════ 6. Journal des décisions ═══════════ -->
   <section>
     <div class="h2row"><h2>Journal des décisions</h2>
       <span class="hint">une ligne datée et motivée par décision — l'historique décisionnel du portefeuille (T3)</span></div>
@@ -218,7 +266,7 @@
     </table></div>
   </section>
 
-  <!-- ═══════════ 6. Historique hebdomadaire ═══════════ -->
+  <!-- ═══════════ 7. Historique hebdomadaire ═══════════ -->
   <section>
     <div class="h2row"><h2>Historique des revues</h2>
       <span class="hint">une entrée par revue hebdomadaire — la tendance importe plus que la valeur (T7)</span></div>
@@ -232,7 +280,7 @@
 </main>
 
 <footer class="colophon">
-  Méthode PRAXIS v1.0 — D. Dambreville — domaine public (CC0 1.0).
+  Méthode PRAXIS v1.2 — D. Dambreville — domaine public (CC0 1.0).
   Ce fichier est autonome : le registre vit dans son bloc <code>PRAXIS_DATA</code> ;
   mettez-le à jour au geste ⑤ de chaque revue (bouton « Modifier les données », ou par votre assistant IA),
   puis « Exporter » pour enregistrer la nouvelle version du fichier.
@@ -252,75 +300,355 @@
 </dialog>
 
 <!-- ════════════════════════════════════════════════════════════════════════
-     PRAXIS_DATA — SOURCE UNIQUE DE VÉRITÉ DU REGISTRE (règle T1)
+     PRAXIS_DATA — SOURCE UNIQUE DE VÉRITÉ DU REGISTRE (règles T1, T8)
      Les données ci-dessous sont un EXEMPLE ENTIÈREMENT FICTIF, fourni pour
      illustrer le rendu : remplacez tous les éléments [entre crochets] et les
      entrées d'exemple par vos propres données à la première utilisation.
      Éditable à la main, par le dialogue intégré, ou par l'assistant IA.
      Dates au format AAAA-MM-JJ. Statuts : INTENTION | ACTIF | SUSPENDU |
      DOMAINE | RESSOURCE | ARCHIVÉ. Postures : P1..P5. Stades : 0..9.
+
+     TABLEAU DE FLUX (méthode §6) — la colonne d'une carte se DÉDUIT du couple
+     (statut, stade) ; aucun champ « colonne » n'existe, et ne doit exister :
+        SAS (éléments du sas) · INTENTION 0–1 · INSTRUCTION 2–4 ·
+        EN COURS 5–6 · VÉRIFICATION 7 · RÉCOLTE 8 · SORTI 9
+        SUSPENDU : hors flux, en réserve.
+     « flux.limites » porte les limites d'encours des colonnes INSTRUCTION et
+     VÉRIFICATION ; celle d'EN COURS vaut limite_encours_par_personne × nombre
+     de personnes. « seuil_age_jours » à null = 2× le temps de cycle médian.
+     « date_entree_flux » (entrée en INSTRUCTION) et « date_sortie » (arrivée
+     en SORTI) servent au calcul du temps de cycle et du débit : renseignez-les
+     à l'engagement et à la clôture, sans quoi ces mesures restent vides.
      ════════════════════════════════════════════════════════════════════════ -->
 <script id="PRAXIS_DATA" type="application/json">
 {
   "portefeuille": "[NOM DU PORTEFEUILLE]",
-  "niveau_conformite": 1,
+  "niveau_conformite": 2,
   "date_revue": "2026-01-12",
   "cycle_purge_jours": 7,
   "limite_encours_par_personne": 2,
-  "personnes": ["[INITIALES]"],
+  "personnes": [
+    "[INITIALES]"
+  ],
+  "flux": {
+    "limites": {
+      "INSTRUCTION": 3,
+      "VERIFICATION": 2
+    },
+    "fenetre_debit_semaines": 12,
+    "seuil_age_jours": null
+  },
   "registre": [
     {
-      "id": "PROJET-ALPHA", "nom": "[Projet exemple Alpha — remplacez-moi]", "taxon": "A-MARQUE-UN/PROJET-ALPHA",
-      "statut": "ACTIF", "posture": "P2", "stade": 6, "proprietaire": "[INITIALES]",
-      "echeance": "2026-03-15", "date_statut": "2025-12-01",
-      "tampon_consomme_pct": 35, "avancement_pct": 55,
+      "id": "PROJET-ALPHA",
+      "nom": "[Projet exemple Alpha — remplacez-moi]",
+      "taxon": "A-MARQUE-UN/PROJET-ALPHA",
+      "statut": "ACTIF",
+      "posture": "P2",
+      "stade": 6,
+      "proprietaire": "[INITIALES]",
+      "echeance": "2026-03-15",
+      "date_statut": "2025-12-01",
+      "date_entree_flux": "2025-10-06",
+      "date_sortie": "",
+      "tampon_consomme_pct": 35,
+      "avancement_pct": 55,
       "benefice": "[Grandeur mesurable] +[N]/mois à M+6 — ligne de base mesurée le 2025-11-25 : [valeur]",
       "derniere_decision": "2026-01-05 — [décision structurante validée]"
     },
     {
-      "id": "DOMAINE-BETA", "nom": "[Domaine exemple Bêta — activité exploitée]", "taxon": "A-MARQUE-UN/DOMAINE-BETA",
-      "statut": "DOMAINE", "posture": "P3", "stade": 7, "proprietaire": "[INITIALES]",
-      "echeance": "", "date_statut": "2025-09-10",
-      "tampon_consomme_pct": null, "avancement_pct": null,
-      "benefice": "Procédure d'exploitation : 2025-09-10_7_procedure-exploitation.md",
+      "id": "PROJET-ZETA",
+      "nom": "[Projet exemple Zêta — livré, en attente de vérification]",
+      "taxon": "A-MARQUE-UN/PROJET-ZETA",
+      "statut": "ACTIF",
+      "posture": "P2",
+      "stade": 7,
+      "proprietaire": "[INITIALES]",
+      "echeance": "2026-02-01",
+      "date_statut": "2025-09-05",
+      "date_entree_flux": "2025-07-21",
+      "date_sortie": "",
+      "tampon_consomme_pct": 80,
+      "avancement_pct": 90,
+      "benefice": "[Grandeur mesurable] −[N] % de reprises — ligne de base mesurée le 2025-07-15 : [valeur]",
+      "derniere_decision": "2025-09-05 — livraison proposée à la vérification"
+    },
+    {
+      "id": "PROJET-EPSILON",
+      "nom": "[Projet exemple Epsilon — instruction en cours]",
+      "taxon": "B-MARQUE-DEUX/PROJET-EPSILON",
+      "statut": "INTENTION",
+      "posture": "P4",
+      "stade": 4,
+      "proprietaire": "[INITIALES]",
+      "echeance": "2026-02-20",
+      "date_statut": "2025-12-15",
+      "date_entree_flux": "2025-12-15",
+      "date_sortie": "",
+      "tampon_consomme_pct": null,
+      "avancement_pct": null,
+      "benefice": "À l'instruction : bénéfice énoncé, ligne de base à mesurer avant engagement",
+      "derniere_decision": "2025-12-15 — instruction ouverte ; engagement (passage du stade 4) au jalon du 2026-02-20"
+    },
+    {
+      "id": "IDEE-ETA",
+      "nom": "[Idée exemple Êta — instruction ouverte]",
+      "taxon": "0-PILOTAGE",
+      "statut": "INTENTION",
+      "posture": "",
+      "stade": 3,
+      "proprietaire": "[INITIALES]",
+      "echeance": "",
+      "date_statut": "2025-12-22",
+      "date_entree_flux": "2025-12-22",
+      "date_sortie": "",
+      "tampon_consomme_pct": null,
+      "avancement_pct": null,
+      "benefice": "À instruire : dépendances et ressources à recenser avant tout engagement",
+      "derniere_decision": "2025-12-22 — décision d'instruire prise en revue mensuelle"
+    },
+    {
+      "id": "IDEE-THETA",
+      "nom": "[Idée exemple Thêta — bordures à poser]",
+      "taxon": "0-PILOTAGE",
+      "statut": "INTENTION",
+      "posture": "",
+      "stade": 2,
+      "proprietaire": "[INITIALES]",
+      "echeance": "",
+      "date_statut": "2026-01-02",
+      "date_entree_flux": "2026-01-02",
+      "date_sortie": "",
+      "tampon_consomme_pct": null,
+      "avancement_pct": null,
+      "benefice": "À instruire : périmètre et interfaces à borner",
+      "derniere_decision": "2026-01-02 — décision d'instruire ; la colonne INSTRUCTION est désormais pleine"
+    },
+    {
+      "id": "IDEE-DELTA",
+      "nom": "[Idée exemple Delta — à instruire]",
+      "taxon": "0-PILOTAGE",
+      "statut": "INTENTION",
+      "posture": "",
+      "stade": 1,
+      "proprietaire": "[INITIALES]",
+      "echeance": "",
+      "date_statut": "2026-01-02",
+      "date_entree_flux": "",
+      "date_sortie": "",
+      "tampon_consomme_pct": null,
+      "avancement_pct": null,
+      "benefice": "À instruire : énoncé de bénéfice + critères d'abandon avant tout engagement",
+      "derniere_decision": "2026-01-02 — inscrite en intention ; instruction différée, colonne INSTRUCTION pleine"
+    },
+    {
+      "id": "DOMAINE-BETA",
+      "nom": "[Domaine exemple Bêta — activité exploitée]",
+      "taxon": "A-MARQUE-UN/DOMAINE-BETA",
+      "statut": "DOMAINE",
+      "posture": "P3",
+      "stade": 8,
+      "proprietaire": "[INITIALES]",
+      "echeance": "",
+      "date_statut": "2025-09-10",
+      "date_entree_flux": "2025-05-12",
+      "date_sortie": "",
+      "tampon_consomme_pct": null,
+      "avancement_pct": null,
+      "benefice": "Procédure d'exploitation : 2025-09-10_7_procedure-exploitation.md — bénéfices à mesurer à M+6 (2026-03-10)",
       "derniere_decision": "2026-01-08 — [incident corrigé, runbook mis à jour]"
     },
     {
-      "id": "PROJET-GAMMA", "nom": "[Projet exemple Gamma — suspendu]", "taxon": "B-MARQUE-DEUX/PROJET-GAMMA",
-      "statut": "SUSPENDU", "posture": "P1", "stade": 5, "proprietaire": "[INITIALES]",
-      "echeance": "2026-04-01", "date_statut": "2025-11-20",
-      "tampon_consomme_pct": 60, "avancement_pct": 30,
+      "id": "PROJET-GAMMA",
+      "nom": "[Projet exemple Gamma — suspendu]",
+      "taxon": "B-MARQUE-DEUX/PROJET-GAMMA",
+      "statut": "SUSPENDU",
+      "posture": "P1",
+      "stade": 5,
+      "proprietaire": "[INITIALES]",
+      "echeance": "2026-04-01",
+      "date_statut": "2025-11-20",
+      "date_entree_flux": "2025-09-08",
+      "date_sortie": "",
+      "tampon_consomme_pct": 60,
+      "avancement_pct": 30,
       "benefice": "Condition de reprise : clôture de PROJET-ALPHA — réexamen le 2026-04-01",
       "derniere_decision": "2025-11-20 — suspension, condition de reprise datée"
     },
     {
-      "id": "IDEE-DELTA", "nom": "[Idée exemple Delta — à instruire]", "taxon": "0-PILOTAGE",
-      "statut": "INTENTION", "posture": "", "stade": 1, "proprietaire": "[INITIALES]",
-      "echeance": "", "date_statut": "2026-01-02",
-      "tampon_consomme_pct": null, "avancement_pct": null,
-      "benefice": "À instruire : énoncé de bénéfice + critères d'abandon avant tout engagement",
-      "derniere_decision": "2026-01-02 — inscrite en intention, prochaine revue mensuelle"
+      "id": "PROJET-IOTA",
+      "nom": "[Projet exemple Iota — clos]",
+      "taxon": "A-MARQUE-UN/PROJET-IOTA",
+      "statut": "ARCHIVÉ",
+      "posture": "P2",
+      "stade": 9,
+      "proprietaire": "[INITIALES]",
+      "echeance": "",
+      "date_statut": "2025-10-28",
+      "date_entree_flux": "2025-09-20",
+      "date_sortie": "2025-10-28",
+      "tampon_consomme_pct": null,
+      "avancement_pct": null,
+      "benefice": "Bénéfices mesurés à la sortie ; rendez-vous M+6 et M+12 inscrits",
+      "derniere_decision": "2025-10-28 — archivage, écart estimé/réalisé versé aux classes de référence"
+    },
+    {
+      "id": "PROJET-KAPPA",
+      "nom": "[Projet exemple Kappa — clos]",
+      "taxon": "A-MARQUE-UN/PROJET-KAPPA",
+      "statut": "ARCHIVÉ",
+      "posture": "P1",
+      "stade": 9,
+      "proprietaire": "[INITIALES]",
+      "echeance": "",
+      "date_statut": "2025-11-14",
+      "date_entree_flux": "2025-09-23",
+      "date_sortie": "2025-11-14",
+      "tampon_consomme_pct": null,
+      "avancement_pct": null,
+      "benefice": "Bénéfices mesurés à la sortie ; rendez-vous M+6 et M+12 inscrits",
+      "derniere_decision": "2025-11-14 — archivage après vérification"
+    },
+    {
+      "id": "PROJET-LAMBDA",
+      "nom": "[Projet exemple Lambda — clos]",
+      "taxon": "B-MARQUE-DEUX/PROJET-LAMBDA",
+      "statut": "ARCHIVÉ",
+      "posture": "P2",
+      "stade": 9,
+      "proprietaire": "[INITIALES]",
+      "echeance": "",
+      "date_statut": "2025-12-03",
+      "date_entree_flux": "2025-11-02",
+      "date_sortie": "2025-12-03",
+      "tampon_consomme_pct": null,
+      "avancement_pct": null,
+      "benefice": "Bénéfices mesurés à la sortie ; rendez-vous M+6 et M+12 inscrits",
+      "derniere_decision": "2025-12-03 — archivage, petit lot, temps de cycle le plus court du trimestre"
+    },
+    {
+      "id": "PROJET-MU",
+      "nom": "[Projet exemple Mu — abandonné sur critère]",
+      "taxon": "B-MARQUE-DEUX/PROJET-MU",
+      "statut": "ARCHIVÉ",
+      "posture": "P4",
+      "stade": 9,
+      "proprietaire": "[INITIALES]",
+      "echeance": "",
+      "date_statut": "2025-12-19",
+      "date_entree_flux": "2025-10-14",
+      "date_sortie": "2025-12-19",
+      "tampon_consomme_pct": null,
+      "avancement_pct": null,
+      "benefice": "Critère d'abandon atteint le 2025-12-19 : hypothèse [H1] invalidée — sortie assumée, pas un échec",
+      "derniere_decision": "2025-12-19 — abandon sur critère prédéfini ; enseignements versés au contexte"
+    },
+    {
+      "id": "PROJET-NU",
+      "nom": "[Projet exemple Nu — clos]",
+      "taxon": "A-MARQUE-UN/PROJET-NU",
+      "statut": "ARCHIVÉ",
+      "posture": "P3",
+      "stade": 9,
+      "proprietaire": "[INITIALES]",
+      "echeance": "",
+      "date_statut": "2026-01-09",
+      "date_entree_flux": "2025-11-25",
+      "date_sortie": "2026-01-09",
+      "tampon_consomme_pct": null,
+      "avancement_pct": null,
+      "benefice": "Bénéfices mesurés à la sortie ; rendez-vous M+6 et M+12 inscrits",
+      "derniere_decision": "2026-01-09 — archivage après vérification"
     }
   ],
   "sas": [
-    { "nom": "[facture-fournisseur.pdf]", "depose_le": "2026-01-09", "question": "" },
-    { "nom": "[notes-entretien.txt]", "depose_le": "2026-01-11", "question": "" }
+    {
+      "nom": "[facture-fournisseur.pdf]",
+      "depose_le": "2026-01-09",
+      "question": ""
+    },
+    {
+      "nom": "[notes-entretien.txt]",
+      "depose_le": "2026-01-11",
+      "question": ""
+    }
   ],
   "journal": [
-    { "date": "2026-01-05", "objet": "PROJET-ALPHA", "decision": "[Validation d'un livrable de conception]", "motif": "[retours convergents de N entretiens]" },
-    { "date": "2026-01-02", "objet": "IDEE-DELTA", "decision": "Inscription en INTENTION", "motif": "opportunité identifiée ; instruction différée — limite d'encours atteinte" },
-    { "date": "2025-11-20", "objet": "PROJET-GAMMA", "decision": "Suspension avec condition de reprise", "motif": "encours > 2 ; priorité au projet Alpha" }
+    {
+      "date": "2026-01-09",
+      "objet": "PROJET-NU",
+      "decision": "Archivage après vérification",
+      "motif": "bénéfices mesurés ; écart estimé/réalisé versé aux classes de référence"
+    },
+    {
+      "date": "2026-01-05",
+      "objet": "PROJET-ALPHA",
+      "decision": "[Validation d'un livrable de conception]",
+      "motif": "[retours convergents de N entretiens]"
+    },
+    {
+      "date": "2026-01-02",
+      "objet": "IDEE-DELTA",
+      "decision": "Inscription en INTENTION, instruction différée",
+      "motif": "colonne INSTRUCTION pleine (3/3) — on aide à finir avant de commencer (K3)"
+    },
+    {
+      "date": "2025-12-19",
+      "objet": "PROJET-MU",
+      "decision": "Abandon sur critère prédéfini",
+      "motif": "hypothèse [H1] invalidée à la mesure du 2025-12-18"
+    },
+    {
+      "date": "2025-11-20",
+      "objet": "PROJET-GAMMA",
+      "decision": "Suspension avec condition de reprise",
+      "motif": "encours > 2 ; priorité au projet Alpha"
+    }
   ],
   "indicateurs_manuels": {
     "latence_decisionnelle_jours": 2,
-    "taux_sortie_90j": 1.0,
+    "taux_sortie_90j": 1.25,
     "benefice_realise_pct_prevu": null,
     "indice_divergence": "nul",
     "commentaire_divergence": "registre confronté aux artefacts le 2026-01-12 — aucun écart"
   },
   "historique": [
-    { "semaine": "2026-S01", "sas": 5, "actifs": 1, "taux_sortie": 1.0, "latence": 3, "tampon_max": 30, "note": "" },
-    { "semaine": "2026-S02", "sas": 2, "actifs": 1, "taux_sortie": 1.0, "latence": 2, "tampon_max": 35, "note": "revue du 2026-01-12" }
+    {
+      "semaine": "2025-S50",
+      "sas": 4,
+      "actifs": 3,
+      "taux_sortie": 1.0,
+      "latence": 4,
+      "tampon_max": 62,
+      "note": ""
+    },
+    {
+      "semaine": "2025-S51",
+      "sas": 3,
+      "actifs": 3,
+      "taux_sortie": 1.0,
+      "latence": 3,
+      "tampon_max": 68,
+      "note": ""
+    },
+    {
+      "semaine": "2026-S01",
+      "sas": 5,
+      "actifs": 3,
+      "taux_sortie": 1.2,
+      "latence": 3,
+      "tampon_max": 74,
+      "note": ""
+    },
+    {
+      "semaine": "2026-S02",
+      "sas": 2,
+      "actifs": 3,
+      "taux_sortie": 1.25,
+      "latence": 2,
+      "tampon_max": 80,
+      "note": "revue du 2026-01-12 — PROJET-ZETA au-delà du seuil d'âge en VÉRIFICATION"
+    }
   ]
 }
 </script>
@@ -363,6 +691,7 @@ function computeAll(){
   const sasSerie = H.map(h => h.sas);
   const sasCroissant3 = sasSerie.length >= 3 && sasSerie.slice(-3).every((v,i,a) => i===0 || v > a[i-1]);
   return {
+    flux: computeFlux(),
     actifs, nActifs: actifs.length, parPersonne, maxEncours,
     nIntentions: R.filter(p=>p.statut==="INTENTION").length,
     nSuspendus: R.filter(p=>p.statut==="SUSPENDU").length,
@@ -372,6 +701,159 @@ function computeAll(){
     latence: M.latence_decisionnelle_jours, tauxSortie: M.taux_sortie_90j,
     benefice: M.benefice_realise_pct_prevu, divergence: M.indice_divergence
   };
+}
+
+/* ════════════════ Tableau de flux (méthode §6) ════════════════ */
+/* Les colonnes agrègent la grille des stades 0–9 ; la position d'une carte se
+   DÉDUIT du couple (statut, stade) — aucune donnée ne vit ici (règles K1, T8). */
+const COLONNES = [
+  { k:"SAS",          n:"Sas",          st:"non classé", lim:null },
+  { k:"INTENTION",    n:"Intention",    st:"stades 0–1", lim:null },
+  { k:"INSTRUCTION",  n:"Instruction",  st:"stades 2–4", lim:"conf" },
+  { k:"EN_COURS",     n:"En cours",     st:"stades 5–6", lim:"pers" },
+  { k:"VERIFICATION", n:"Vérification", st:"stade 7",    lim:"conf" },
+  { k:"RECOLTE",      n:"Récolte",      st:"stade 8",    lim:null },
+  { k:"SORTI",        n:"Sorti",        st:"stade 9",    lim:null }
+];
+const LIMITEES = ["INSTRUCTION","EN_COURS","VERIFICATION"];
+
+function colonneDe(p){
+  const s = (p.statut||"").toUpperCase().replace("ARCHIVE","ARCHIVÉ");
+  if(s === "SUSPENDU")  return "RESERVE";
+  if(s === "RESSOURCE") return null;                 /* hors flux */
+  if(s === "ARCHIVÉ")   return "SORTI";
+  const st = (p.stade == null) ? 0 : Number(p.stade);
+  if(s === "DOMAINE")   return st >= 9 ? "SORTI" : "RECOLTE";
+  if(s === "INTENTION") return st <= 1 ? "INTENTION" : "INSTRUCTION";
+  if(st <= 4) return "INSTRUCTION";
+  if(st <= 6) return "EN_COURS";
+  if(st === 7) return "VERIFICATION";
+  if(st === 8) return "RECOLTE";
+  return "SORTI";
+}
+
+function computeFlux(){
+  const R = DATA.registre || [], F = DATA.flux || {}, LC = F.limites || {};
+  const nPers = Math.max(1, (DATA.personnes||[]).length);
+  const limPers = DATA.limite_encours_par_personne || 2;
+
+  /* — temps de cycle : entrée en INSTRUCTION → arrivée en SORTI — */
+  const jours = (a,b) => Math.round((new Date(b+"T12:00:00") - new Date(a+"T12:00:00"))/86400000);
+  const sorties = R.filter(p => p.date_entree_flux && p.date_sortie)
+                   .map(p => ({ sortie:p.date_sortie, cycle: jours(p.date_entree_flux, p.date_sortie) }))
+                   .filter(x => isFinite(x.cycle) && x.cycle >= 0);
+  const cycles = sorties.map(x => x.cycle).sort((a,b) => a-b);
+  const mesurable = cycles.length >= 5;              /* §6.4 : moins de 5 sorties = un chiffre, pas une mesure */
+  const centile = t => cycles.length ? cycles[Math.min(cycles.length-1, Math.round(t*(cycles.length-1)))] : null;
+  const median = mesurable ? centile(0.5) : null;
+  const c85    = mesurable ? centile(0.85) : null;
+
+  /* — débit sur fenêtre glissante — */
+  const fen = F.fenetre_debit_semaines || 12;
+  const t0 = new Date(today().getTime() - fen*7*86400000);
+  const debitN = sorties.filter(x => new Date(x.sortie+"T12:00:00") >= t0).length;
+  const debitSem = debitN / fen;
+
+  /* — seuil d'âge (K5) : 2× le temps de cycle médian, à défaut valeur prudente — */
+  const seuilAge = (F.seuil_age_jours != null) ? F.seuil_age_jours
+                 : (median != null ? 2*median : 30);
+
+  /* — répartition des cartes — */
+  const cols = {}; COLONNES.forEach(c => cols[c.k] = []);
+  /* K5 ne vaut que pour le travail engagé : une carte en RÉCOLTE attend
+     légitimement ses rendez-vous de mesure à 6 et 12 mois. */
+  const reserve = [];
+  (DATA.sas||[]).forEach(x => cols.SAS.push({
+    nom: x.nom, id: "", taxon: "", proprietaire: "", posture: "", echeance: "",
+    age: ageJours(x.depose_le), sas: true, question: x.question || ""
+  }));
+  R.forEach(p => {
+    const k = colonneDe(p); if(!k) return;
+    const carte = {
+      nom: p.nom, id: p.id || "", taxon: p.taxon || "", proprietaire: p.proprietaire || "",
+      posture: p.posture || "", echeance: p.echeance || "", stade: p.stade,
+      age: ageJours(p.date_statut), statut: p.statut, condition: p.benefice || ""
+    };
+    if(k === "RESERVE") reserve.push(carte); else cols[k].push(carte);
+  });
+  Object.keys(cols).forEach(k => cols[k].sort((a,b) => (b.age ?? 0) - (a.age ?? 0)));
+  cols.SORTI.sort((a,b) => (a.age ?? 0) - (b.age ?? 0));   /* les sorties les plus récentes d'abord */
+
+  /* — limites et occupation — */
+  const limiteDe = c => c.lim === "pers" ? limPers*nPers
+                      : c.lim === "conf" ? (LC[c.k] ?? null) : null;
+  const wip = LIMITEES.reduce((s,k) => s + cols[k].length, 0);
+  const agesEnCours = LIMITEES.flatMap(k => cols[k].map(c => c.age)).filter(a => a != null);
+  const ageMax = agesEnCours.length ? Math.max(...agesEnCours) : 0;
+  const depassements = COLONNES.filter(c => { const L = limiteDe(c); return L != null && cols[c.k].length > L; }).length;
+
+  return { cols, reserve, limiteDe, wip, ageMax, seuilAge, median, c85, mesurable,
+           nSorties: cycles.length, debitN, debitSem, fen, depassements, nPers, limPers };
+}
+
+function carteHtml(c, seuilAge){
+  const vieille = c.age != null && seuilAge != null && c.age > seuilAge;
+  const meta = [];
+  if(c.proprietaire) meta.push(`<span>${esc(c.proprietaire)}</span>`);
+  if(c.posture)      meta.push(`<span>${esc(c.posture)}</span>`);
+  if(c.stade != null)meta.push(`<span title="${esc(STADES[c.stade]||"")}">st. ${c.stade}</span>`);
+  if(c.age != null)  meta.push(`<span class="kage" title="âge dans la colonne">${vieille?"△ ":""}${c.age} j</span>`);
+  if(c.echeance)     meta.push(`<span title="échéance">⇥ ${esc(c.echeance)}</span>`);
+  if(c.question)     meta.push(`<span>? ${esc(c.question)}</span>`);
+  return `<div class="kcard${vieille?" aged":""}" role="listitem">
+    ${c.id ? `<div class="kid">${esc(c.id)}</div>` : ""}
+    <div class="kn">${esc(c.nom)}</div>
+    <div class="kmeta">${meta.join("")}</div>
+    ${vieille ? `<div class="knote">seuil de ${seuilAge} j dépassé — action ou changement de statut (K5)</div>` : ""}
+  </div>`;
+}
+
+function renderFlux(C){
+  const X = C.flux;
+  document.getElementById("flux").innerHTML = COLONNES.map(c => {
+    const cartes = X.cols[c.k], L = X.limiteDe(c);
+    const etat = L == null ? "" : (cartes.length > L ? "over" : (cartes.length === L ? "full" : ""));
+    const limTxt = L == null ? "sans limite"
+                 : (c.lim === "pers" ? `limite ${L} (${X.limPers} / personne)` : `limite ${L}`);
+    return `<div class="card col ${etat}" role="list" aria-label="${esc(c.n)}">
+      <div class="colhead">
+        <span class="cn">${esc(c.n)}</span><span class="cst">${esc(c.st)}</span>
+        <div class="cwip"><span class="n">${cartes.length}</span><span class="lim">${esc(limTxt)}</span></div>
+        ${etat === "over" ? `<div style="margin-top:6px">${badge("alert","dépassée (K3)")}</div>`
+        : etat === "full" ? `<div style="margin-top:6px">${badge("watch","pleine")}</div>` : ""}
+      </div>
+      <div class="cards">${cartes.length
+        ? (c.k === "SORTI" ? cartes.slice(0,6) : cartes).map(x => carteHtml(x, LIMITEES.includes(c.k) ? X.seuilAge : null)).join("")
+          + ((c.k === "SORTI" && cartes.length > 6) ? `<div class="kmore">+ ${cartes.length-6} sorties antérieures — voir le registre</div>` : "")
+        : `<div class="kempty">—</div>`}</div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("reserve").innerHTML =
+    `<div class="rt">Hors flux — suspendus (${X.reserve.length})</div>` +
+    (X.reserve.length
+      ? `<div class="rlist">${X.reserve.map(x => carteHtml(x, null)).join("")}</div>
+         <div class="taxon" style="margin-top:8px">Chacun porte une condition de reprise vérifiable et une date de réexamen : à défaut, c'est un projet zombie (§5.4).</div>`
+      : `<div class="taxon" style="margin-top:6px">Aucun objet suspendu.</div>`);
+
+  const nf = n => (Math.round(n*100)/100).toString().replace(".", ",");
+  const mes = [
+    { label:"Encours (WIP)", value:X.wip, unit:"cartes",
+      note:`colonnes limitées · ${X.depassements ? X.depassements+" dépassement(s)" : "aucun dépassement"}` },
+    { label:"Temps de cycle médian", value: X.mesurable ? X.median : "—", unit:"j",
+      note: X.mesurable ? `85ᵉ centile : ${X.c85} j · sur ${X.nSorties} sorties mesurées`
+                        : `${X.nSorties} sortie(s) mesurée(s) — il en faut 5 pour que ce soit une mesure (§6.4)` },
+    { label:`Débit (${X.fen} sem.)`, value:X.debitN, unit:"sorties",
+      note:`soit ${nf(X.debitSem)} par semaine · contre-indicateur du temps de cycle` },
+    { label:"Seuil d'âge (K5)", value:X.seuilAge, unit:"j",
+      note: X.mesurable ? "2× le temps de cycle médian" : "valeur prudente, à recalculer dès 5 sorties" }
+  ];
+  document.getElementById("fluxmes").innerHTML = mes.map(m => `
+    <div class="card m">
+      <div class="label">${esc(m.label)}</div>
+      <div class="value">${esc(String(m.value))}<span class="unit">${esc(m.unit)}</span></div>
+      <div class="note">${esc(m.note)}</div>
+    </div>`).join("");
 }
 
 /* ════════════════ Tuiles ════════════════ */
@@ -386,6 +868,9 @@ function renderTiles(C){
     {label:"Intentions en attente", value:C.nIntentions, note:"revues au rendez-vous mensuel", state:"neutral"},
     {label:"Suspendus", value:C.nSuspendus, note:"chacun a une condition de reprise datée", state: C.nSuspendus ? "watch" : "ok"},
     {label:"Domaines exploités", value:C.nDomaines, note:"chacun a sa procédure (C3)", state:"neutral"},
+    {label:"Temps de cycle médian", value: C.flux.mesurable ? C.flux.median + " j" : "—",
+     note: C.flux.mesurable ? `85ᵉ centile : ${C.flux.c85} j · ${C.flux.debitN} sorties en ${C.flux.fen} sem.`
+                            : "moins de 5 sorties mesurées", state:"neutral"},
     {label:"Alertes actives", value:alertes, note: alertes ? "voir le panier d'indicateurs" : "aucune décision forcée cette semaine",
      state: alertes ? "alert" : "ok"}
   ];
@@ -410,14 +895,15 @@ function collectIndics(C){
     { n:"2 · Latence de classement", d:`âge du plus ancien élément du sas · seuil : > ${C.cycle} j`,
       v:C.sasMax, u:"j", spark:[],
       state: C.sasMax > C.cycle ? (C.sasMax > 2*C.cycle ? "alert" : "watch") : "ok" },
-    { n:"3 · Encours actif par personne", d:`seuil : > ${lim}`,
+    { n:"3 · Encours actif par personne", d:`tableau de flux, colonnes limitées · seuil : > ${lim}`,
       v:C.maxEncours, u:`/ ${lim}`, spark:serie("actifs"),
-      state: C.maxEncours > lim ? "alert" : "ok" },
-    { n:"4 · Âge du plus ancien actif", d:"seuil indicatif : > 2× le délai médian de vos projets",
-      v:C.plusAncienActif, u:"j", spark:[],
-      state: "neutral" },
-    { n:"5 · Taux de sortie (90 j)", d:"projets clos / projets ouverts · seuil : durablement < 1",
-      v:(C.tauxSortie ?? "—"), u:"", spark:serie("taux_sortie"),
+      state: C.maxEncours > lim || C.flux.depassements ? "alert" : "ok" },
+    { n:"4 · Âge de la plus ancienne carte", d:`colonnes limitées · seuil : > ${C.flux.seuilAge} j (2× le temps de cycle médian)`,
+      v:C.flux.ageMax, u:"j", spark:[],
+      state: C.flux.ageMax > C.flux.seuilAge ? "alert"
+           : (C.flux.ageMax > 0.75*C.flux.seuilAge ? "watch" : "ok") },
+    { n:"5 · Débit et taux de sortie", d:`sorties sur ${C.flux.fen} sem. · taux de sortie 90 j : ${C.tauxSortie ?? "—"} · seuil : débit en baisse sur 3 cycles, taux durablement < 1`,
+      v:C.flux.debitN, u:`/ ${C.flux.fen} sem.`, spark:serie("taux_sortie"),
       state: C.tauxSortie == null ? "neutral" : (C.tauxSortie < 1 ? "watch" : "ok") },
     { n:"6 · Tampon vs avancement", d:"écart max (consommé − avancement) · seuil : > +20 pts",
       v:(C.tamponEcartMax == null ? "—" : (C.tamponEcartMax>0?"+":"")+C.tamponEcartMax), u:"pts", spark:serie("tampon_max"),
@@ -527,7 +1013,7 @@ function renderHisto(){
 /* ════════════════ En-tête ════════════════ */
 function renderHead(){
   document.getElementById("hd-title").textContent = "Tableau de bord — " + (DATA.portefeuille || "Portefeuille");
-  document.getElementById("hd-sub").textContent = "registre · indicateurs · décisions · sas";
+  document.getElementById("hd-sub").textContent = "registre · flux · indicateurs · décisions · sas";
   document.getElementById("hd-date").textContent = fmtDate(DATA.date_revue);
   document.getElementById("hd-niveau").textContent = DATA.niveau_conformite ?? "—";
   document.title = "Tableau de bord — " + (DATA.portefeuille || "PRAXIS");
@@ -536,7 +1022,7 @@ function renderHead(){
 /* ════════════════ Rendu global ════════════════ */
 function renderAll(){
   const C = computeAll();
-  renderHead(); renderTiles(C); renderIndics(C); renderRegFilters(); renderRegistre(); renderSas(C); renderJournal(); renderHisto();
+  renderHead(); renderTiles(C); renderFlux(C); renderIndics(C); renderRegFilters(); renderRegistre(); renderSas(C); renderJournal(); renderHisto();
 }
 
 /* ════════════════ Édition, export, thème ════════════════ */

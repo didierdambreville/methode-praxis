@@ -2,11 +2,11 @@
 ## Méthode de travail entrepreneuriale — classer, piloter, collaborer avec l'assistant IA
 
 **Auteur :** D. Dambreville
-**Version :** 1.0
-**Date :** 24 août 2026
+**Version :** 1.2
+**Date :** 1er septembre 2026
 **Statut :** édition publique
 **Licence :** domaine public — CC0 1.0 Universal
-**Nature :** méthode opératoire construite par application conjointe du Référentiel de classification unifiée des projets (RCUP), de la méthode TELOS (conduite de projet) et de la méthode SOBRE (architecture d'instruction pour LLM), outillée par deux gabarits : le document de contexte de projet et le classeur de pilotage.
+**Nature :** méthode opératoire construite par application conjointe du Référentiel de classification unifiée des projets (RCUP), de la méthode TELOS (conduite de projet) et de la méthode SOBRE (architecture d'instruction pour LLM), outillée par deux gabarits : le document de contexte de projet et le classeur de pilotage. La version 1.2 y adjoint un tableau de flux, emprunté à la méthode Kanban, comme seconde vue du tableau de bord.
 
 ---
 
@@ -29,6 +29,13 @@ Trois précautions, héritées des sources et maintenues ici.
 
 **Troisième précaution.** Les termes normatifs **DOIT**, **NE DOIT PAS**, **DEVRAIT**, **PEUT** sont employés au sens de la RFC 2119, comme dans le RCUP. Réserver **DOIT** aux invariants réels est une discipline : l'inflation impérative est une pathologie documentée.
 
+### Historique des versions
+
+| Version | Date | Évolution |
+|---|---|---|
+| 1.0 | 24 août 2026 | Édition publique initiale : six principes, cinq dispositifs, cycle en cinq gestes, neuf indicateurs, quatorze pièges. |
+| 1.2 | 1er septembre 2026 | Ajout du **tableau de flux** (§6), seconde vue du tableau de bord empruntée à la méthode Kanban : sept colonnes adossées à la grille des stades, limites d'encours par colonne, règles de sortie explicites, mesures de temps de cycle et de débit. Indicateurs 3, 4 et 5 redéfinis sur ces mesures ; deux pièges ajoutés (15 et 16) ; annexes B et F mises à jour. Aucun dispositif matériel nouveau, aucune cadence nouvelle. |
+
 ---
 
 ## Table des matières
@@ -38,15 +45,16 @@ Trois précautions, héritées des sources et maintenues ici.
 3. [L'architecture matérielle : cinq dispositifs](#3-larchitecture-matérielle--cinq-dispositifs)
 4. [Le cycle opératoire : cinq gestes](#4-le-cycle-opératoire--cinq-gestes)
 5. [La conduite de projet, de l'intention à la récolte](#5-la-conduite-de-projet-de-lintention-à-la-récolte)
-6. [Les cadences](#6-les-cadences)
-7. [La collaboration avec l'assistant IA](#7-la-collaboration-avec-lassistant-ia)
-8. [Les indicateurs et le tableau de bord](#8-les-indicateurs-et-le-tableau-de-bord)
-9. [Pièges et contre-mesures](#9-pièges-et-contre-mesures)
-10. [Niveaux d'adoption et compression](#10-niveaux-dadoption-et-compression)
-11. [Limites et modes de défaillance](#11-limites-et-modes-de-défaillance)
-12. [Correspondance avec les sources](#12-correspondance-avec-les-sources)
+6. [Le tableau de flux](#6-le-tableau-de-flux)
+7. [Les cadences](#7-les-cadences)
+8. [La collaboration avec l'assistant IA](#8-la-collaboration-avec-lassistant-ia)
+9. [Les indicateurs et le tableau de bord](#9-les-indicateurs-et-le-tableau-de-bord)
+10. [Pièges et contre-mesures](#10-pièges-et-contre-mesures)
+11. [Niveaux d'adoption et compression](#11-niveaux-dadoption-et-compression)
+12. [Limites et modes de défaillance](#12-limites-et-modes-de-défaillance)
+13. [Correspondance avec les sources](#13-correspondance-avec-les-sources)
 
-**Annexes** : [A. Gabarit de nommage](#annexe-a--gabarit-de-nommage) · [B. Ordre du jour de la revue hebdomadaire](#annexe-b--ordre-du-jour-de-la-revue-hebdomadaire) · [C. Checklist de lancement](#annexe-c--checklist-de-lancement-de-projet) · [D. Checklist de sortie](#annexe-d--checklist-de-sortie-de-projet) · [E. Glossaire](#annexe-e--glossaire)
+**Annexes** : [A. Gabarit de nommage](#annexe-a--gabarit-de-nommage) · [B. Ordre du jour de la revue hebdomadaire](#annexe-b--ordre-du-jour-de-la-revue-hebdomadaire) · [C. Checklist de lancement](#annexe-c--checklist-de-lancement-de-projet) · [D. Checklist de sortie](#annexe-d--checklist-de-sortie-de-projet) · [E. Glossaire](#annexe-e--glossaire) · [F. Règles du tableau de flux](#annexe-f--règles-du-tableau-de-flux)
 
 ---
 
@@ -67,7 +75,7 @@ PRAXIS **NE DOIT PAS** être considérée comme couvrant : les obligations léga
 
 ### 1.3 Conditions de pertinence
 
-La méthode est rentable dès qu'un portefeuille compte plusieurs objets simultanés de nature hétérogène et que l'horizon de conservation excède la durée d'un projet. En deçà d'une centaine d'artefacts et d'un projet unique, son coût excède son bénéfice : appliquer alors la seule compression du §10, niveau 1.
+La méthode est rentable dès qu'un portefeuille compte plusieurs objets simultanés de nature hétérogène et que l'horizon de conservation excède la durée d'un projet. En deçà d'une centaine d'artefacts et d'un projet unique, son coût excède son bénéfice : appliquer alors la seule compression du §11, niveau 1.
 
 ---
 
@@ -80,7 +88,7 @@ Chaque lettre nomme un principe ; chaque principe est la forme opératoire d'une
 | **P** | **Pilotage par le bénéfice** | Un projet est un moyen ; la mesure ultime est le bénéfice réalisé et vérifié, jamais la conformité au plan. Aucun projet n'est clos tant que ses bénéfices n'ont pas été mesurés. | TELOS, strate T |
 | **R** | **Rangement orthogonal** | Trois questions indépendantes — de quoi s'agit-il, où en est la production, qu'en fait-on — reçoivent trois mécanismes distincts : le sujet fait l'arbre, le stade fait le chiffre, le statut fait le registre. Tout ce qui entre passe par le sas. | RCUP, axes A, B, C |
 | **A** | **Adaptation contingente** | Le degré de formalisation est proportionné à la nature de l'objet piloté, déterminée par diagnostic et non par habitude. La sur-régulation gaspille ; la sous-régulation ruine. | TELOS, strate E |
-| **X** | **eXécution en flux instrumenté** | L'encours est limité, les marges sont agrégées en tampon unique, et tout engagement est observé par une source indépendante du déclarant. Un plan non instrumenté est une fiction. | TELOS, strates L et O |
+| **X** | **eXécution en flux instrumenté** | L'encours est limité **et visible** — le tableau de flux montre où chaque chose est arrêtée et depuis quand ; les marges sont agrégées en tampon unique ; tout engagement est observé par une source indépendante du déclarant. Un plan non instrumenté est une fiction. | TELOS, strates L et O ; Kanban |
 | **I** | **Instruction sobre** | L'assistant IA reçoit la configuration minimale de jetons à signal élevé : une information, un lieu ; le volumineux sur disque, chargé à la demande ; rien sans preuve d'effet. Tout artefact généré a un propriétaire humain qui en répond. | SOBRE, principes S·O·B·R·É |
 | **S** | **Systémique** | Le cycle est une spirale, non une flèche : la maintenance réalimente l'observation, la revue interroge le plan et pas seulement l'écart au plan, la clôture n'a que deux issues — domaine ou archive — et l'écart estimé/réalisé nourrit les classes de référence. | TELOS, strate S ; RCUP, §15 |
 
@@ -93,7 +101,7 @@ Deux subordinations traversent les six principes :
 
 ## 3. L'architecture matérielle : cinq dispositifs
 
-PRAXIS tient dans cinq dispositifs. Aucun sixième n'est admis sans passer le test de retrait (§7.5) : si sa suppression ne dégrade rien de mesurable, il ne devait pas exister.
+PRAXIS tient dans cinq dispositifs. Aucun sixième n'est admis sans passer le test de retrait (§8.5) : si sa suppression ne dégrade rien de mesurable, il ne devait pas exister.
 
 ```
    NIVEAU PORTEFEUILLE
@@ -145,11 +153,12 @@ Le sas est l'**entrée unique** du système : tout artefact entrant — fichier 
 
 ### 3.3 D3 — Le tableau de bord de portefeuille
 
-Le tableau de bord est un fichier HTML autonome (`tableau_de_bord.html`), ouvrable localement sans aucune dépendance externe. Il matérialise **trois choses et trois seulement** :
+Le tableau de bord est un fichier HTML autonome (`tableau_de_bord.html`), ouvrable localement sans aucune dépendance externe. Il matérialise **quatre choses et quatre seulement** :
 
 1. **le registre** — la table unique des objets pilotés, portant pour chacun : identifiant, taxon, désignation, statut (INTENTION / ACTIF / SUSPENDU / DOMAINE / RESSOURCE / ARCHIVÉ), posture TELOS, stade dominant, échéance, propriétaire, consommation de tampon, dernière décision. C'est la **source unique de vérité** de l'axe Statut (RCUP, N3 et C1) ;
-2. **le panier d'indicateurs** — les neuf signaux du §8, avec leurs seuils ;
-3. **le journal des décisions et le sas** — les dernières décisions datées et motivées (RCUP, C5 ; TELOS, registre des décisions) et l'état du sas.
+2. **le tableau de flux** — la vue en colonnes du même registre, avec les limites d'encours et l'âge des cartes (§6). Une vue, jamais une source : il ne porte aucune donnée propre ;
+3. **le panier d'indicateurs** — les neuf signaux du §9, avec leurs seuils ;
+4. **le journal des décisions et le sas** — les dernières décisions datées et motivées (RCUP, C5 ; TELOS, registre des décisions) et l'état du sas.
 
 Règles de tenue :
 
@@ -288,9 +297,9 @@ La checklist complète figure en annexe C. Le financement — en temps comme en 
 
 ### 5.3 Exécution : le flux
 
-- **F1.** **Limite d'encours : au plus deux projets ACTIFS par personne.** C'est la disposition au meilleur rendement de toute la méthode — coût nul, effet immédiat. Le tableau de bord l'affiche et la revue hebdomadaire la fait respecter.
+- **F1.** **Limite d'encours : au plus deux projets ACTIFS par personne.** C'est la disposition au meilleur rendement de toute la méthode — coût nul, effet immédiat. Le tableau de flux l'affiche colonne par colonne (§6.2) et la revue hebdomadaire la fait respecter.
 - **F2.** **Tampon unique agrégé.** Les tâches sont estimées à leur durée médiane, sans marge individuelle ; la marge retirée est concentrée en un tampon de fin de projet. Le taux de consommation du tampon, rapporté à l'avancement, est l'indicateur de santé central du projet.
-- **F3.** **Suivi d'âge.** L'âge du plus ancien élément en cours et l'âge des dépendances externes non résolues sont des indicateurs avancés plus fiables que tout pourcentage d'avancement déclaré.
+- **F3.** **Suivi d'âge.** L'âge du plus ancien élément en cours et l'âge des dépendances externes non résolues sont des indicateurs avancés plus fiables que tout pourcentage d'avancement déclaré. Le tableau de flux les affiche par carte et par colonne (K5).
 - **F4.** **Petits lots.** Réduire la taille des lots jusqu'au point où le coût de transaction devient limitant, puis attaquer ce coût par l'automatisation.
 
 ### 5.4 Jalons : la double boucle
@@ -309,7 +318,93 @@ Un projet quittant ACTIF **DOIT** entrer soit en **DOMAINE** — il est exploit�
 
 ---
 
-## 6. Les cadences
+## 6. Le tableau de flux
+
+Le cycle (§4) traite l'entrée ; la conduite de projet (§5) traite la vie d'un objet piloté. Entre les deux subsistait un point aveugle : **le travail engagé était compté sans être vu**. La limite d'encours (F1) existait comme règle, le registre en donnait le nombre, mais rien ne montrait *où* chaque chose était arrêtée, ni depuis quand. Une limite qu'on ne voit pas est une limite qu'on transgresse de bonne foi.
+
+Le tableau de flux comble ce manque en empruntant à la **méthode Kanban** ses quatre pratiques transposables à l'échelle entrepreneuriale : visualiser le travail, limiter l'encours par étape, gérer le flux par la mesure, rendre les règles explicites. Il n'est **pas un sixième dispositif** : c'est la seconde vue du tableau de bord (D3, §3.3), construite sur le registre et sur rien d'autre.
+
+### 6.1 Pourquoi cet emprunt est admissible
+
+Une méthode conçue par soustraction ne s'augmente pas sans justification. Trois raisons rendent celle-ci recevable.
+
+**Elle n'ajoute rien de matériel.** Le tableau de flux n'introduit ni fichier, ni réunion, ni saisie : il affiche autrement des données déjà tenues au registre — statut, stade, propriétaire, date de statut. Il passe donc le test de retrait à l'envers : son ajout ne crée aucune tenue nouvelle.
+
+**Elle instrumente un principe déjà là.** Le principe **X** — eXécution en flux instrumenté — postulait qu'« un plan non instrumenté est une fiction ». La v1.0 en tenait la moitié : la limite d'encours et le tampon. Le tableau de flux tient l'autre moitié : l'endroit où le travail s'arrête, et le temps qu'il y passe.
+
+**Elle épouse la doctrine de la source.** Kanban ne prescrit ni rôles, ni itérations, ni périmètre : il s'applique au travail tel qu'il se fait, et change par petits incréments respectant l'organisation existante. C'est la seule famille de méthodes de flux qui s'ajoute à PRAXIS sans en déplacer les dispositifs.
+
+Ce que PRAXIS **ne** reprend **pas** de Kanban, et pourquoi :
+
+| Élément Kanban | Statut dans PRAXIS | Motif du retrait |
+|---|---|---|
+| Classes de service (standard, urgent, date fixe, intangible) | écarté | la posture P1–P5, arrêtée par diagnostic (§5.2), remplit déjà cette fonction — et par mesure plutôt que par étiquette |
+| Accords de niveau de service par classe | écarté | à l'échelle entrepreneuriale, le risque de délai est porté par le tampon agrégé (F2), pas par un engagement contractuel |
+| Les sept cadences Kanban | écarté | PRAXIS a ses cadences (§7) ; une seule est obligatoire, et le tableau s'y lit. Aucune instance nouvelle |
+| Modèle de coût du délai | écarté | l'énoncé de bénéfice et les critères d'abandon (§5.1–5.2) arbitrent déjà, et sur la valeur plutôt que sur le retard |
+| Tableau à deux niveaux (portefeuille et opérationnel) | écarté | un seul registre, une seule vue — règle de résidence unique (RCUP, N4) |
+| Diagramme de flux cumulé | facultatif, niveau 3 | l'historique hebdomadaire (T7) donne la tendance à un coût très inférieur |
+
+### 6.2 Le flux canonique : sept colonnes
+
+Les colonnes ne sont pas des catégories inventées pour l'occasion : elles **agrègent la grille des stades 0–9** (annexe A) et se lisent avec le statut. Un objet piloté occupe une colonne et une seule ; sa position s'y déduit de ses coordonnées, sans champ supplémentaire.
+
+| Colonne | Stades | Statut | Limite d'encours | Règle de sortie — ce qui autorise le passage à la colonne suivante |
+|---|---|---|---|---|
+| **SAS** | — | non classé | aucune, mais purgé chaque cycle | l'artefact a reçu ses coordonnées (taxon, stade, statut) et son nom au gabarit |
+| **INTENTION** | 0–1 | INTENTION | aucune — c'est un réservoir, pas un encours | une décision datée d'instruire, prise en revue mensuelle |
+| **INSTRUCTION** | 2–4 | INTENTION | **3** | énoncé de bénéfice **avec ligne de base mesurée**, critères d'abandon écrits et datés, posture arrêtée (annexe C) |
+| **EN COURS** | 5–6 | ACTIF | **2 par personne** (F1) | le livrable existe et est complet au sens de sa spécification |
+| **VÉRIFICATION** | 7 | ACTIF | **2** | la vérification humaine est faite, datée et signée par un propriétaire nommé |
+| **RÉCOLTE** | 8 | DOMAINE ou ACTIF | aucune, mais l'âge est surveillé | les bénéfices sont mesurés contre la ligne de base, aux rendez-vous de 6 et 12 mois |
+| **SORTI** | 9 | DOMAINE ou ARCHIVÉ | aucune | deux issues seulement, jamais une troisième (§5.5) |
+
+Un objet occupe une colonne et une seule : les intervalles de stades ne se recouvrent pas, et le passage en statut ACTIF coïncide avec l'entrée en colonne EN COURS — c'est-à-dire avec le franchissement du stade 4, seuil d'engagement de la méthode (§5.2). Un objet ACTIF au stade 4 est une contradiction que le tableau rend visible immédiatement.
+
+**Hors flux : SUSPENDU.** Un objet suspendu quitte les colonnes et se range dans une réserve explicite, portant sa condition de reprise et sa date de réexamen (§5.4). Cette réserve est visible en permanence : un projet mis de côté qu'on ne voit plus est un projet zombie en formation.
+
+Deux observations gouvernent la lecture de ce tableau.
+
+La colonne **VÉRIFICATION porte sa propre limite**, et ce n'est pas une précaution de style : la seconde subordination de la méthode — la production est subordonnée à la vérification (§2) — a une conséquence de flux directe. À l'ère de l'assistance générative, la production est bon marché et la vérification ne l'est pas ; le goulot d'étranglement s'est déplacé vers l'aval. Un tableau où les cartes s'accumulent en VÉRIFICATION pendant que EN COURS reste ouvert décrit exactement la pathologie que PRAXIS combat.
+
+La colonne **RÉCOLTE n'est pas décorative.** Elle rend visible, semaine après semaine, l'écart entre ce qui est livré et ce dont le bénéfice est mesuré. C'est la contre-mesure visuelle du piège 10 (abandon des bénéfices) : une colonne qui se remplit sans se vider est un portefeuille qui produit sans savoir s'il rend.
+
+### 6.3 Les règles du tableau
+
+- **K1.** Le tableau de flux **EST une vue du registre**, jamais une source. Aucune donnée ne vit dans le tableau qui ne vive au registre. Toute carte porte l'identifiant d'une entrée du registre, et une seule (RCUP, N4 ; règle T1).
+- **K2.** Chaque colonne **DOIT** afficher sa limite d'encours et son occupation courante. Une limite non affichée n'existe pas.
+- **K3.** Une colonne pleine **NE DOIT PAS** recevoir de carte supplémentaire. La conduite à tenir est alors une et une seule : **aider à finir avant de commencer**. Le réflexe inverse — ouvrir un travail neuf parce que le travail engagé est bloqué — est le mécanisme même du piège 4.
+- **K4.** Le passage d'une colonne à la suivante **DOIT** satisfaire la règle de sortie déclarée au §6.2. Ces règles sont explicites, écrites et affichées ; leur modification est une décision de revue trimestrielle, consignée au journal.
+- **K5.** L'**âge de chaque carte dans sa colonne** est affiché. Toute carte dont l'âge dépasse **deux fois le temps de cycle médian** est signalée d'office à la revue hebdomadaire et reçoit soit une action de déblocage, soit un changement de statut. L'âge d'un travail en cours est le signal avancé le plus fiable dont dispose la méthode : il précède la dérive de tampon et ne dépend d'aucune déclaration.
+- **K6.** Le tableau **NE DOIT PAS** créer d'instance nouvelle. Il se lit à la revue hebdomadaire, au point 2 de l'ordre du jour (annexe B), et nulle part ailleurs.
+- **K7.** Le nombre de colonnes est fermé. Une colonne **NE PEUT** être ajoutée qu'en en retirant une autre — le test de retrait s'applique aux colonnes comme aux dispositifs. La prolifération des colonnes est la maladie infantile du tableau de flux : chaque colonne ajoutée est une file d'attente créée.
+
+### 6.4 Les mesures de flux
+
+Trois grandeurs se déduisent du tableau sans aucune saisie supplémentaire. Elles ne s'ajoutent pas au panier — la parcimonie (§9.1) l'interdit — : elles **alimentent** les indicateurs 3, 4 et 5 et fournissent les seuils des autres.
+
+| Mesure | Définition | Lecture |
+|---|---|---|
+| **Encours (WIP)** | nombre de cartes présentes dans les colonnes limitées | se compare directement aux limites ; c'est l'indicateur 3 |
+| **Temps de cycle** | délai entre l'entrée en INSTRUCTION et l'arrivée en SORTI, en jours | on retient la **médiane** et le **85ᵉ centile** : la médiane décrit le cas courant, le centile décrit ce qu'on peut promettre. La moyenne, elle, ne décrit rien |
+| **Débit** | nombre de cartes arrivées en SORTI par période | contre-indicateur obligatoire du temps de cycle : un temps de cycle qui s'améliore pendant que le débit s'effondre signale un portefeuille qu'on a vidé, non accéléré |
+
+Ces trois grandeurs sont liées par une relation stable, connue sous le nom de **loi de Little** : en régime établi, *encours = débit × temps de cycle*. Elle a une conséquence pratique qui justifie à elle seule tout le dispositif : **à débit constant, réduire l'encours réduit proportionnellement le temps de cycle**. Autrement dit, la limite d'encours n'est pas une discipline morale ni un vœu d'hygiène mentale — c'est le seul levier qui raccourcisse les délais sans travailler davantage.
+
+Deux avertissements de lecture, hérités des principes d'instrumentation (§9.1) :
+
+- la relation vaut **en régime établi** ; elle ne dit rien d'un portefeuille en démarrage, où l'encours croît sans sorties. Un temps de cycle calculé sur moins de cinq sorties est un chiffre, pas une mesure ;
+- le temps de cycle a des **limites naturelles de variation**. Une semaine plus lente n'est pas une dérive : aucune action corrective à l'intérieur des limites. Réagir au bruit dégrade la performance, ici comme ailleurs.
+
+### 6.5 Ce que le tableau ne fait pas
+
+Le tableau de flux montre où le travail est arrêté ; il ne dit pas s'il **fallait** l'engager. Cette question relève de l'énoncé de bénéfice et des critères d'abandon (§5.2), et le tableau est muet sur elle. Un portefeuille dont le flux est excellent et les bénéfices nuls est parfaitement possible : les cartes traversent vite des colonnes qui ne mènent nulle part. C'est précisément pourquoi le panier d'indicateurs reste **contradictoire** (§9.1) et pourquoi le tableau n'y ajoute aucun signal de vitesse supplémentaire — la vitesse est déjà surreprésentée dans l'attention naturelle d'un entrepreneur.
+
+Corollaire, à retenir contre la tentation de l'outil : **un tableau de flux tenu à jour n'est pas un travail fait**. Il est la contre-mesure du piège 4 ; il est aussi, mal employé, un support de choix pour le piège 14.
+
+---
+
+## 7. Les cadences
 
 Chaque instance est justifiée par la **décision qu'elle produit** ; une instance qui ne produit aucune décision est supprimée. À l'échelle entrepreneuriale, une seule est obligatoire : la revue hebdomadaire.
 
@@ -332,9 +427,9 @@ Trois règles de tenue :
 
 ---
 
-## 7. La collaboration avec l'assistant IA
+## 8. La collaboration avec l'assistant IA
 
-### 7.1 Répartition des rôles
+### 8.1 Répartition des rôles
 
 | L'assistant | L'humain |
 |---|---|
@@ -344,9 +439,9 @@ Trois règles de tenue :
 | prépare les mises à jour du contexte, du classeur, du tableau de bord | relit et enregistre ; porte la responsabilité de chaque artefact |
 | génère des hypothèses, des comparables, des brouillons | décide ; signe ; tranche les arbitrages de valeur |
 
-L'assistance générative déplace le goulot d'étranglement de la production vers la vérification, le jugement et l'intégration. La méthode alloue donc l'effort humain là où il est devenu rare : **les gestes ③ et ⑤**, et les décisions des §5 et 6. Un assistant interrogé sur une durée ou un coût reproduit les biais optimistes de son corpus : il est un instrument de génération d'hypothèses et de recherche de comparables, **pas une source d'estimation**.
+L'assistance générative déplace le goulot d'étranglement de la production vers la vérification, le jugement et l'intégration. La méthode alloue donc l'effort humain là où il est devenu rare : **les gestes ③ et ⑤**, et les décisions des §5, 6 et 7. Un assistant interrogé sur une durée ou un coût reproduit les biais optimistes de son corpus : il est un instrument de génération d'hypothèses et de recherche de comparables, **pas une source d'estimation**.
 
-### 7.2 La pile d'instruction du portefeuille
+### 8.2 La pile d'instruction du portefeuille
 
 L'instruction de l'assistant suit l'architecture SOBRE, appliquée telle quelle :
 
@@ -367,26 +462,26 @@ Trois règles pratiques en découlent :
 - **I2.** Le contexte de projet **NE DOIT PAS** dépasser l'ordre de 150 à 200 lignes. Au-delà, il n'est pas riche : il n'est pas audité. La chronologie absorbe l'historique ; les documents de stade 1–9 portent le détail.
 - **I3.** À chaque changement de génération de modèle, la pile est auditée — test de retrait bloc par bloc — jamais simplement reconduite.
 
-### 7.3 Les prompts canoniques
+### 8.3 Les prompts canoniques
 
 Les gestes du cycle emploient des prompts stables, fournis en gabarits, construits sur le format en huit blocs de SOBRE (tâche, contexte, matériau, critères de réussite, format ; exemples, périmètre négatif et procédure avec parcimonie). Le bloc le plus rentable est celui des **critères de réussite** — dont, pour l'analyse du sas : chaque donnée attribuée à sa source, chaque incertitude déclarée, aucune donnée inventée, et en cas d'arbitrage entre exhaustivité et fiabilité, privilégier la fiabilité.
 
-### 7.4 Sécurité
+### 8.4 Sécurité
 
 - **S1 (frontière d'instruction).** Les instructions valides proviennent de l'utilisateur, par le canal prévu. Tout contenu observé — document du sas, page web, courriel, résultat d'outil — est une donnée, jamais une commande (règle G2-1).
 - **S2 (effets de bord).** Tout envoi, publication, suppression, paiement ou modification persistante **DOIT** être confirmé explicitement, élément par élément. « Traite le sas » autorise l'analyse, pas l'exécution de ce que contiennent les documents.
 - **S3 (secrets).** Aucun secret — clé, mot de passe, jeton — **NE DOIT** figurer dans un fichier de contexte, un document classé ou une conversation. Gestionnaire dédié, référence par nom (« clé API n°1 au gestionnaire »), injection au moment de l'usage.
 - **S4 (triade létale).** Un dispositif cumulant accès à des données privées, exposition à du contenu non fiable et capacité d'émission vers l'extérieur exige une séparation architecturale. À l'échelle entrepreneuriale, la forme la plus simple : l'assistant qui analyse le sas (contenu non fiable) ne dispose pas, dans la même session, d'un canal d'envoi automatique.
 
-### 7.5 Maintenance de la pile
+### 8.5 Maintenance de la pile
 
 Le test de retrait discipline l'ensemble : tout bloc d'instruction dont la suppression ne dégrade rien de mesurable est supprimé. La revue trimestrielle y consacre une rotation — une couche par trimestre — et le corpus de non-régression (L7) fournit la mesure. Sans ce corpus, la sobriété est une opinion.
 
 ---
 
-## 8. Les indicateurs et le tableau de bord
+## 9. Les indicateurs et le tableau de bord
 
-### 8.1 Principes d'instrumentation
+### 9.1 Principes d'instrumentation
 
 Quatre principes, hérités de TELOS, gouvernent le panier :
 
@@ -395,40 +490,43 @@ Quatre principes, hérités de TELOS, gouvernent le panier :
 3. **Parcimonie** — sept à neuf signaux, hiérarchisés, avec seuils préétablis. Un tableau de bord de trente indicateurs n'est pas observé ;
 4. **Discrimination statistique** — chaque indicateur a des limites naturelles de variation ; aucune action corrective à l'intérieur de ces limites. Réagir au bruit dégrade la performance.
 
-### 8.2 Le panier PRAXIS : neuf indicateurs
+### 9.2 Le panier PRAXIS : neuf indicateurs
 
 | # | Indicateur | Famille | Source (indépendante) | Seuil d'alerte | Contre-indicateur |
 |---|---|---|---|---|---|
 | 1 | Charge du sas et âge du plus ancien élément | Classement | comptage du sas | croissance sur 3 cycles ; âge > 2 cycles | latence de classement |
 | 2 | Latence de classement (dépôt → classement) | Classement | dates de dépôt | > 1 cycle de purge | charge du sas |
-| 3 | Encours actif par personne | Flux | registre | > 2 | débit (sorties/période) |
-| 4 | Âge du plus ancien élément en cours | Flux | backlog / registre | > 2× le délai médian | débit |
-| 5 | Taux de sortie (projets clos / ouverts, 90 j) | Portefeuille | registre | durablement < 1 | qualité des sorties (D vs A) |
+| 3 | Encours actif par personne | Flux | tableau de flux — occupation des colonnes limitées | > 2 | débit (sorties/période) |
+| 4 | Âge de la plus ancienne carte en cours | Flux | tableau de flux — âge par carte (K5) | > 2× le temps de cycle médian | débit |
+| 5 | Débit et taux de sortie (90 j) | Portefeuille | tableau de flux + registre | débit en baisse sur 3 cycles ; taux durablement < 1 | temps de cycle ; qualité des sorties (D vs A) |
 | 6 | Consommation de tampon / avancement | Projet | classeur de pilotage | zone rouge (conso > avancement + 20 pts) | périmètre livré |
 | 7 | Latence décisionnelle médiane | Gouvernance | journal des décisions | > 5 jours ouvrés | qualité des décisions |
 | 8 | Bénéfice réalisé / profil prévu | Valeur | système métier (mesure réelle) | écart > 20 % | coût engagé |
 | 9 | Indice de divergence (déclaré vs constaté) | Méta | comparaison statut / données | tout écart persistant | — |
 
+Le panier **reste à neuf signaux** : le tableau de flux (§6) n'en ajoute aucun, il en change la source. Les indicateurs 3, 4 et 5 se lisent désormais sur les colonnes plutôt que sur le registre seul, ce qui les rend constatés et non déclarés — exigence du premier principe d'instrumentation. Le **temps de cycle** (médian et 85ᵉ centile) n'est pas un dixième indicateur : c'est la **grandeur de référence** qui fournit le seuil de l'indicateur 4 et le contre-indicateur de l'indicateur 5. La parcimonie interdit de le compter deux fois.
+
 Le neuvième mesure la fiabilité du dispositif de mesure lui-même : l'écart entre ce que le registre déclare et ce que les données objectives montrent. En solo, il prend une forme simple et sans complaisance : *le tableau de bord dit-il encore la vérité ?* Un statut ACTIF sans aucun artefact produit depuis trois semaines est un écart persistant.
 
-### 8.3 Tenue du tableau de bord
+### 9.3 Tenue du tableau de bord
 
-- **T5.** Les valeurs des indicateurs 1 à 5 et 7 **DEVRAIENT** être calculées, non déclarées : le tableau de bord les dérive du registre, du journal et des dates qu'il porte. Les indicateurs 6 et 8 sont saisis depuis leurs sources (classeur, système métier).
+- **T5.** Les valeurs des indicateurs 1 à 5 et 7 **DEVRAIENT** être calculées, non déclarées : le tableau de bord les dérive du registre, du journal, du tableau de flux et des dates qu'il porte. Les indicateurs 6 et 8 sont saisis depuis leurs sources (classeur, système métier).
 - **T6.** Le tableau de bord affiche chaque indicateur avec son seuil et son état (nominal / à surveiller / alerte). L'ergonomie recherchée est celle d'un poste de pilotage : l'état d'ensemble en dix secondes, le détail en un geste.
 - **T7.** L'historique hebdomadaire des indicateurs est conservé dans le fichier même (une entrée par revue), ce qui rend visibles les tendances — la tendance importe plus que la valeur.
+- **T8.** Le tableau de flux **NE DOIT PAS** porter de donnée propre : toute colonne, toute limite et toute carte se déduisent du registre et des paramètres déclarés (K1). Un champ qui n'existerait qu'au tableau de flux est une seconde résidence, donc une violation de N4.
 
 ---
 
-## 9. Pièges et contre-mesures
+## 10. Pièges et contre-mesures
 
-Sélection croisée des référentiels de pièges des trois documents fondateurs, ramenée aux quatorze pièges les plus fréquents à l'échelle entrepreneuriale. Le tableau se lit en revue : la colonne « signal au tableau de bord » dit où le piège se voit.
+Sélection croisée des référentiels de pièges des trois documents fondateurs, ramenée aux seize pièges les plus fréquents à l'échelle entrepreneuriale. Le tableau se lit en revue : la colonne « signal au tableau de bord » dit où le piège se voit.
 
 | # | Piège | Mécanisme | Contre-mesure PRAXIS | Signal au tableau de bord |
 |---|---|---|---|---|
 | 1 | Répertoire d'humeur | dossiers « Urgent », « En cours » | orthogonalité : le statut vit au registre | — (violation visible à l'œil) |
 | 2 | Projet zombie | ni actif, ni clos, ni archivé | règle des deux issues ; suspension avec condition datée | taux de sortie < 1 ; âge des actifs |
 | 3 | Sédimentation | rien ne se clôt, tout s'accumule | stade 9 systématique ; purge du sas | charge du sas croissante |
-| 4 | Fragmentation attentionnelle | multitâche, effondrement du débit | limite d'encours : 2 par personne | encours > 2 |
+| 4 | Fragmentation attentionnelle | multitâche, effondrement du débit | limite d'encours : 2 par personne, affichée par colonne (K2–K3) | encours > 2 ; colonne en dépassement |
 | 5 | Biais de planification | vue de l'intérieur, sous-estimation | intervalle + classe de référence | dérive tampon précoce |
 | 6 | Escalade d'engagement | coûts irrécupérables | critères d'abandon prédéfinis ; test de l'observateur extérieur | critère d'abandon approché |
 | 7 | Syndrome de l'étudiant / Parkinson | marges locales dissipées | estimation médiane + tampon unique | conso tampon vs avancement |
@@ -438,11 +536,13 @@ Sélection croisée des référentiels de pièges des trois documents fondateurs
 | 11 | Amnésie organisationnelle | rien ne se capitalise | journal des décisions ; chronologie du contexte ; classes de référence | journal vide sur 1 mois |
 | 12 | Documentation déguisée | le contexte IA répète ce que les fichiers disent | test de retrait ; critère « non inférable » | contexte > 200 lignes |
 | 13 | Instruction observée | l'assistant obéit à un document analysé | frontière d'instruction (G2-1) ; confirmation des effets de bord | — (revue des incidents) |
-| 14 | Théâtre méthodologique | rituels vidés de fonction | chaque instance justifiée par sa décision ; test de falsification (§11) | latence décisionnelle ; journal |
+| 14 | Théâtre méthodologique | rituels vidés de fonction | chaque instance justifiée par sa décision ; test de falsification (§12) | latence décisionnelle ; journal |
+| 15 | Tableau décoratif | le tableau de flux est tenu à jour et ne change aucune décision | K3 : une colonne pleine interdit d'ouvrir un travail neuf ; toute carte hors seuil d'âge reçoit une action ou un changement de statut | colonnes en dépassement ; cartes signalées par K5 |
+| 16 | Prolifération des colonnes | chaque exception obtient sa colonne ; le tableau finit par cartographier ses propres files d'attente | K7 : nombre de colonnes fermé ; une colonne ne s'ajoute qu'en en retirant une autre | temps de cycle qui s'allonge à débit constant |
 
 ---
 
-## 10. Niveaux d'adoption et compression
+## 11. Niveaux d'adoption et compression
 
 Une adoption partielle doit rester cohérente. Trois niveaux, cumulatifs.
 
@@ -452,18 +552,18 @@ Une adoption partielle doit rester cohérente. Trois niveaux, cumulatifs.
 2. Un sas, purgé chaque semaine (N8).
 3. Le tableau de bord tient le registre : tout objet piloté a un statut, la sortie n'a que deux issues (N3, N5).
 4. La revue hebdomadaire, au créneau fixe, exécute les gestes ② à ⑤.
-5. Limite d'encours : deux projets actifs par personne.
+5. Limite d'encours : deux projets actifs par personne, **visible** au tableau de flux — colonnes, occupation, limite affichée (K2).
 6. Pour tout engagement : énoncé de bénéfice d'une demi-page **avec ligne de base mesurée**, et critères d'abandon en trois lignes datées.
 7. Un registre des décisions (le journal du tableau de bord), tenu sans exception.
 8. Un contexte de projet par projet actif, court et à jour.
 
 ### Niveau 2 — Standard *(ajoute :)*
 
-La grille de stades 0–9 dans les noms (N2) ; le classeur de pilotage pour les projets qui le justifient ; le diagnostic de contingence à l'engagement et à chaque jalon ; la revue mensuelle de double boucle ; le tampon unique et son suivi ; les indicateurs 1 à 7 tenus.
+La grille de stades 0–9 dans les noms (N2) ; le tableau de flux complet — sept colonnes, limites par colonne, règles de sortie déclarées (annexe F), âge des cartes ; le classeur de pilotage pour les projets qui le justifient ; le diagnostic de contingence à l'engagement et à chaque jalon ; la revue mensuelle de double boucle ; le tampon unique et son suivi ; les indicateurs 1 à 7 tenus.
 
 ### Niveau 3 — Complet *(ajoute :)*
 
-Le gabarit de nommage intégral avec versionnage (D1–D4) ; les neuf indicateurs avec historique ; le prémortem avant tout engagement majeur ; la vérification des bénéfices à 6 et 12 mois versée aux classes de référence ; la revue trimestrielle de portefeuille avec révision groupée du référentiel (N10) et audit de la pile d'instruction ; le corpus de non-régression pour l'assistant.
+Le gabarit de nommage intégral avec versionnage (D1–D4) ; les neuf indicateurs avec historique ; le temps de cycle au 85ᵉ centile et, s'il se justifie, le diagramme de flux cumulé (§6.1) ; le prémortem avant tout engagement majeur ; la vérification des bénéfices à 6 et 12 mois versée aux classes de référence ; la revue trimestrielle de portefeuille avec révision groupée du référentiel (N10) et audit de la pile d'instruction ; le corpus de non-régression pour l'assistant.
 
 Une mise en œuvre **DOIT** déclarer son niveau ; toute dérogation à une exigence du niveau déclaré **DOIT** être écrite et datée dans le dossier de pilotage (RCUP, N9).
 
@@ -471,7 +571,7 @@ Une mise en œuvre **DOIT** déclarer son niveau ; toute dérogation à une exig
 
 ---
 
-## 11. Limites et modes de défaillance
+## 12. Limites et modes de défaillance
 
 **Le coût de la double tenue.** PRAXIS maintient trois artefacts vivants (contexte, classeur, tableau de bord). Le risque est leur divergence silencieuse. La parade est structurelle — chaque information n'a qu'un lieu (§3.5) — et rituelle : le geste ⑤ les met à jour ensemble, dans le même quart d'heure. Si la divergence s'installe malgré cela, c'est que des informations sont dupliquées : auditer la répartition, pas redoubler d'efforts.
 
@@ -481,11 +581,13 @@ Une mise en œuvre **DOIT** déclarer son niveau ; toute dérogation à une exig
 
 **Le biais conservateur.** Comme le référentiel de classement dont elle hérite, PRAXIS excelle à insérer le nouveau dans l'existant et sert mal la rupture. Un projet de posture P4 (exploratoire) supporte mal le cérémonial : on lui applique le niveau 1 seul, avec un jalon d'abandon daté, et rien de plus.
 
+**Le flux excellent d'un portefeuille inutile.** Le tableau de flux mesure la vitesse à laquelle le travail traverse les colonnes ; il ne dit rien de la valeur de ce travail. Un portefeuille peut afficher un temps de cycle court, un débit régulier et aucune colonne en dépassement tout en ne produisant aucun bénéfice mesuré. Le tableau est donc structurellement complaisant, et c'est pourquoi il ne doit jamais être lu seul : l'indicateur 8 (bénéfice réalisé) et la colonne RÉCOLTE sont ses contrepoids obligés. La règle pratique tient en une phrase — *aucune revue ne commente le flux avant d'avoir regardé la récolte*.
+
 **La limite irréductible.** Aucune méthode ne compense un objectif faux ou une incitation perverse maintenue. PRAXIS révèle ces situations — par les critères d'abandon, l'indice de divergence et la mesure des bénéfices — plus vite qu'elle ne les corrige.
 
 ---
 
-## 12. Correspondance avec les sources
+## 13. Correspondance avec les sources
 
 | Élément PRAXIS | Source | Référence précise |
 |---|---|---|
@@ -499,15 +601,19 @@ Une mise en œuvre **DOIT** déclarer son niveau ; toute dérogation à une exig
 | Principes d'instrumentation, panier contradictoire, indice de divergence | TELOS v1.1 | strate O, §6 |
 | Boucles simple/double/triple, clôture en trois actes, vérification des bénéfices | TELOS v1.1 | strate S, §7 |
 | Cadence opératoire, prémortem, revue sans blâme | TELOS v1.1 | §9 |
-| Pièges 2, 4–11, 14 du §9 | TELOS v1.1 | §8 (référentiel des 26 pièges) |
+| Pièges 2, 4–11, 14 du §10 | TELOS v1.1 | §8 (référentiel des 26 pièges) |
 | Sobriété, orthogonalité, bornage, révélation progressive, évaluation | SOBRE v1.0 | §5 |
 | Pile d'instruction L0–L7 | SOBRE v1.0 | §6 |
 | Frontière d'instruction, triade létale, confirmation des effets de bord | SOBRE v1.0 | §22 |
 | Prompt en huit blocs, test de retrait, audit par génération de modèle | SOBRE v1.0 | §16, §5-S, §4.6 |
+| Tableau de flux, limites d'encours par colonne, règles de sortie explicites, âge des cartes | Méthode **Kanban** appliquée au travail de connaissance | pratiques : visualiser, limiter l'encours, gérer le flux, expliciter les règles |
+| Temps de cycle, débit, relation encours = débit × temps de cycle | Théorie des files d'attente (loi de Little), reprise par Kanban | §6.4 |
 | Structure du document de contexte | Modèle Contexte_Projet | intégral |
 | Structure du classeur de pilotage | Modèle Pilotage_Projet | intégral |
 
 Les documents fondateurs sont inclus dans le dépôt (`3-ressources/`) sous leurs licences propres.
+
+**Statut particulier de Kanban.** Contrairement au RCUP, à TELOS et à SOBRE, Kanban n'est pas un document du corpus : c'est un corps de pratiques publiques, sans texte normatif unique et sans licence à respecter. PRAXIS n'en reprend que les quatre pratiques énumérées ci-dessus, et écarte explicitement le reste (§6.1). Cet emprunt ne fait pas de Kanban une quatrième fondation : les trois fondations restent RCUP, TELOS et SOBRE, et le tableau de flux demeure une vue du dispositif D3.
 
 ---
 
@@ -550,7 +656,7 @@ Exemples :
 *Créneau fixe. 30 à 60 minutes. L'assistant prépare ; l'humain vérifie et décide.*
 
 1. **Sas** *(10–20 min)* — gestes ② ③ ④ : analyse du lot par l'assistant, vérification des données contre les sources, validation des coordonnées, renommage et rangement. Objectif de sortie : sas vide, ou éléments restants marqués de la question qui bloque.
-2. **Flux** *(5–10 min)* — encours par personne (limite : 2), âge du plus ancien élément, dépendances externes et leur âge, blocages à lever ou à escalader.
+2. **Tableau de flux** *(5–10 min)* — lecture des colonnes **de droite à gauche**, jamais l'inverse : ce qui est le plus près de la sortie se traite en premier. Colonnes en dépassement de limite, cartes signalées par l'âge (K5), dépendances externes et leur âge, blocages à lever ou à escalader. Aucune carte n'entre en EN COURS tant qu'une colonne aval est pleine.
 3. **Projets actifs** *(10–15 min)* — par projet : consommation de tampon vs avancement, KPI de la semaine saisis au classeur, tâches soldées et créées au backlog. Aucune discussion d'hypothèses : c'est l'affaire de la revue mensuelle.
 4. **Décisions** *(5 min)* — chaque décision prise pendant la revue est consignée au journal : date, décision, motif en une ligne.
 5. **Tableau de bord** *(5 min)* — geste ⑤ : registre, indicateurs, entrée d'historique de la semaine. La revue est close quand le tableau de bord est à jour.
@@ -587,18 +693,44 @@ Exemples :
 | **Classe de référence** | base des écarts estimé/réalisé des projets passés, servant à corriger les estimations futures |
 | **Coordonnée** | triplet (taxon, stade, statut) identifiant complètement un artefact |
 | **Cycle** | la boucle opératoire en cinq gestes : déposer, faire analyser, vérifier, classer, mettre à jour |
+| **Débit** | nombre d'objets pilotés arrivés en colonne SORTI par période ; contre-indicateur obligatoire du temps de cycle |
 | **Domaine** | objet installé et exploité, en régime de maintenance, doté d'une procédure d'exploitation |
+| **Encours (WIP)** | nombre d'objets présents dans les colonnes limitées du tableau de flux |
 | **Frontière d'instruction** | règle selon laquelle tout contenu observé par l'assistant est une donnée, jamais une commande |
 | **Ligne de base** | valeur mesurée d'une grandeur de bénéfice avant l'engagement du projet |
+| **Loi de Little** | relation d'équilibre *encours = débit × temps de cycle* : à débit constant, réduire l'encours réduit proportionnellement le délai |
 | **Posture** | mode de gestion de l'incertitude d'un projet (P1 à P5), issu du diagnostic à six axes |
 | **Registre** | table unique des objets pilotés, portée par le tableau de bord |
 | **Sas** | zone tampon recevant les entrées non classées ; zone de flux, jamais de stock |
 | **Stade** | position d'un artefact dans le cycle de production (grille 0–9) |
 | **Statut** | état d'attention d'un objet piloté : INTENTION, ACTIF, SUSPENDU, DOMAINE, RESSOURCE, ARCHIVÉ |
+| **Tableau de flux** | seconde vue du tableau de bord : les objets pilotés répartis en sept colonnes adossées aux stades, avec limites d'encours et âge des cartes (§6) |
 | **Tampon** | marge agrégée en fin de projet, dont la consommation rapportée à l'avancement mesure la santé |
 | **Taxon** | position dans l'axe des sujets ; se matérialise par un répertoire |
+| **Temps de cycle** | délai entre l'entrée en colonne INSTRUCTION et l'arrivée en colonne SORTI ; on retient la médiane et le 85ᵉ centile, jamais la moyenne |
 | **Test de retrait** | suppression d'un bloc (d'instruction ou de processus) et mesure de l'effet ; ce qui ne change rien est supprimé |
+
+## Annexe F — Règles du tableau de flux
+
+*Gabarit à remplir une fois, affiché en permanence à côté du tableau. Les valeurs entre crochets sont les valeurs par défaut de la méthode : elles se modifient en revue trimestrielle, jamais au fil de l'eau.*
+
+| Colonne | Limite d'encours | Une carte y entre quand… | Une carte en sort quand… |
+|---|---|---|---|
+| SAS | [aucune, purge hebdomadaire] | un artefact est déposé, sans réflexion préalable | ses coordonnées sont établies et son nom conforme au gabarit |
+| INTENTION | [aucune] | une idée est inscrite au registre en statut INTENTION | une décision datée d'instruire est prise en revue mensuelle |
+| INSTRUCTION | [3] | l'instruction commence | l'annexe C est intégralement satisfaite |
+| EN COURS | [2 par personne] | l'engagement est prononcé et le statut passe à ACTIF | le livrable existe et est complet au sens de sa spécification |
+| VÉRIFICATION | [2] | le livrable est proposé à la vérification | la vérification humaine est faite, datée et attribuée |
+| RÉCOLTE | [aucune, âge surveillé] | le livrable est en service | les bénéfices sont mesurés contre la ligne de base |
+| SORTI | [aucune] | l'issue est prononcée | jamais : la colonne se purge par archivage à la revue trimestrielle |
+| *Réserve* SUSPENDU | [aucune] | une suspension est prononcée avec condition de reprise et date de réexamen | la condition est satisfaite (retour en colonne d'origine) ou la date est dépassée (passage en ARCHIVÉ) |
+
+**Trois réglages à arrêter à l'installation**
+
+1. **Le cycle de purge du sas** — hebdomadaire par défaut ; il fixe le seuil de l'indicateur 2.
+2. **La limite de EN COURS** — deux par personne par défaut. Ne l'augmentez jamais pour « faire passer » un travail : c'est la seule limite dont la transgression est mesurable en délai (§6.4).
+3. **Le seuil d'âge d'alerte** — deux fois le temps de cycle médian par défaut. Tant que moins de cinq cartes sont sorties, retenez une valeur absolue prudente (par exemple trente jours) et recalculez-la ensuite.
 
 ---
 
-*La présente méthode est versée au domaine public (CC0 1.0). Les documents fondateurs qu'elle applique — RCUP, TELOS, SOBRE et les deux modèles — demeurent sous leurs licences propres, indiquées dans le dépôt. Architecture d'intégration, cycle en cinq gestes et panier d'indicateurs croisé constituent la contribution propre du présent document.*
+*La présente méthode est versée au domaine public (CC0 1.0). Les documents fondateurs qu'elle applique — RCUP, TELOS, SOBRE et les deux modèles — demeurent sous leurs licences propres, indiquées dans le dépôt. Les pratiques Kanban dont le tableau de flux est dérivé relèvent du domaine public de la pratique professionnelle. Architecture d'intégration, cycle en cinq gestes, panier d'indicateurs croisé et tableau de flux adossé à la grille des stades constituent la contribution propre du présent document.*
